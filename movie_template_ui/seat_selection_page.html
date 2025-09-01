@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seat Selection</title>
+    <!-- Link to the Tailwind CSS CDN for quick setup -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Set up a custom color for the selected seats -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'selected': '#007bff',
+                        'available': '#28a745',
+                        'booked': '#dc3545',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col font-sans text-gray-800">
+
+    <!-- Header with consistent navigation -->
+    <header class="bg-gray-900 text-white shadow-lg w-full">
+        <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between">
+            <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse</h1>
+            <button id="logoutBtn"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
+                Logout
+            </button>
+        </div>
+        <!-- Navbar -->
+        <div class="bg-gray-800 text-white shadow-md w-full">
+            <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
+                <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
+                    <li><a href="index.html" class="hover:text-gray-300 transition duration-300">Home</a></li>
+                    <li><a href="homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+                    <li><a href="shows.html"
+                            class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Shows</a>
+                    </li>
+                    <li><a href="booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
+                            History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow flex flex-col items-center">
+        <div class="container mx-auto p-6 flex flex-col items-center">
+            <h2 id="movieTitle" class="text-3xl font-bold mb-6 mt-4">Movie Seat Selection</h2>
+
+            <!-- Screen Display -->
+            <div
+                class="bg-gray-300 h-8 mt-4 mx-auto w-3/4 md:w-1/2 rounded-md text-center leading-8 font-bold text-gray-800 shadow-lg">
+                SCREEN</div>
+
+            <!-- Seat Layout Grid -->
+            <!-- The grid will be populated dynamically by JavaScript -->
+            <div class="mt-6 flex flex-col items-center gap-2" id="seatLayout"></div>
+
+            <!-- Booking Summary Section -->
+            <div class="summary mt-8 p-6 bg-white rounded-xl shadow-lg w-full max-w-xl">
+                <h3 class="text-lg font-semibold mb-4">Booking Summary</h3>
+                <div class="space-y-2">
+                    <p><strong>Selected Seats:</strong> <span id="selectedSeats"
+                            class="font-normal text-gray-600">None</span></p>
+                    <p><strong>Total Price:</strong> ₹<span id="totalPrice" class="font-normal text-gray-600">0</span>
+                    </p>
+                </div>
+                <div class="flex gap-4 mt-4">
+                    <button id="clearBtn"
+                        class="w-full py-3 px-6 bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">Clear</button>
+                    <button id="proceedBtn"
+                        class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-md hover:bg-blue-700 transition-colors duration-200 disabled:bg-gray-400 disabled:cursor-not-allowed">Proceed
+                        to Payment</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Define the price per seat
+        const seatPrice = 200;
+
+        // Get references to DOM elements
+        const seatLayout = document.getElementById("seatLayout");
+        const selectedSeatsEl = document.getElementById("selectedSeats");
+        const totalPriceEl = document.getElementById("totalPrice");
+        const proceedBtn = document.getElementById("proceedBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        // Initialize an empty array for selected seats
+        let selectedSeats = [];
+
+        // Simulate data from an API call
+        const seatData = {
+            rows: 8,
+            cols: 10,
+            // A set of pre-booked seats for demonstration
+            bookedSeats: new Set(["A3", "A4", "B5", "B6", "D1", "F9"])
+        };
+
+        /**
+          * Toggles the selection state of a seat and updates the UI.
+          * @param {string} seatId - The ID of the seat (e.g., "A1").
+          * @param {HTMLElement} seatDiv - The seat's DOM element.
+          */
+        function toggleSeat(seatId, seatDiv) {
+            if (selectedSeats.includes(seatId)) {
+                // If the seat is already selected, un-select it
+                selectedSeats = selectedSeats.filter(s => s !== seatId);
+                seatDiv.classList.remove("bg-selected", "text-white");
+                seatDiv.classList.add("bg-available", "hover:bg-green-600");
+            } else {
+                // If the seat is not selected, select it
+                selectedSeats.push(seatId);
+                seatDiv.classList.remove("bg-available", "hover:bg-green-600");
+                seatDiv.classList.add("bg-selected", "text-white");
+            }
+            updateSummary();
+        }
+
+        /**
+          * Updates the booking summary section with the current selection.
+          */
+        function updateSummary() {
+            selectedSeatsEl.textContent = selectedSeats.length ? selectedSeats.sort().join(", ") : "None";
+            totalPriceEl.textContent = selectedSeats.length * seatPrice;
+            // Enable or disable buttons based on whether seats are selected
+            proceedBtn.disabled = selectedSeats.length === 0;
+            clearBtn.disabled = selectedSeats.length === 0;
+        }
+
+        /**
+          * Resets the seat selection, un-selecting all seats.
+          */
+        function clearSelection() {
+            // Find all currently selected seats and reset their classes
+            const selectedSeatElements = document.querySelectorAll('.bg-selected');
+            selectedSeatElements.forEach(seat => {
+                seat.classList.remove("bg-selected", "text-white");
+                seat.classList.add("bg-available", "hover:bg-green-600");
+            });
+            // Clear the selectedSeats array and update the summary
+            selectedSeats = [];
+            updateSummary();
+        }
+
+        /**
+          * Loads and renders the seat layout based on the provided data.
+          */
+        function loadSeats() {
+            const { rows, cols, bookedSeats } = seatData;
+            seatLayout.innerHTML = ""; // Clear existing seats
+
+            for (let r = 0; r < rows; r++) {
+                // Create a flex container for the row label and seats
+                const rowContainer = document.createElement("div");
+                rowContainer.classList.add("flex", "items-center", "gap-2");
+
+                // Create the row label (A, B, C, etc.)
+                const rowLabel = document.createElement("div");
+                rowLabel.classList.add("w-6", "h-6", "text-center", "font-bold");
+                rowLabel.textContent = String.fromCharCode(65 + r);
+                rowContainer.appendChild(rowLabel);
+
+                // Create a flex container for just the seats to ensure even spacing
+                const seatRow = document.createElement("div");
+                seatRow.classList.add("flex", "justify-center", "gap-1.5");
+
+                for (let c = 1; c <= cols; c++) {
+                    const seatId = String.fromCharCode(65 + r) + c;
+                    const seatDiv = document.createElement("div");
+
+                    // Base Tailwind classes for a seat
+                    seatDiv.classList.add("w-8", "h-8", "rounded-md", "cursor-pointer", "text-center", "leading-8", "text-sm", "font-bold", "flex", "items-center", "justify-center", "transition-colors", "duration-200");
+
+                    if (bookedSeats.has(seatId)) {
+                        // Booked seats are styled differently and are not clickable
+                        seatDiv.classList.add("bg-booked", "cursor-not-allowed");
+                    } else {
+                        // Available seats are styled and have a click event listener
+                        seatDiv.classList.add("bg-available", "hover:bg-green-600");
+                        seatDiv.addEventListener("click", () => toggleSeat(seatId, seatDiv));
+                    }
+
+                    seatDiv.textContent = c;
+                    seatRow.appendChild(seatDiv);
+                }
+                rowContainer.appendChild(seatRow);
+                seatLayout.appendChild(rowContainer);
+            }
+        }
+
+        // Add event listener for the new clear button
+        clearBtn.addEventListener("click", clearSelection);
+
+        // Add logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('role');
+            window.location.href = '/login.html';
+        });
+
+        // Initial load of the seat map
+        loadSeats();
+
+        // Initial update of the summary
+        updateSummary();
+    </script>
+</body>
+
+</html>

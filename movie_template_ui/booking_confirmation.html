@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+    <!-- Link to the Tailwind CSS CDN for quick setup -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- Header with consistent navigation -->
+    <header class="bg-gray-900 text-white shadow-lg w-full">
+        <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between">
+            <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse</h1>
+            <button id="logoutBtn"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
+                Logout
+            </button>
+        </div>
+        <!-- Navbar -->
+        <div class="bg-gray-800 text-white shadow-md w-full">
+            <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
+                <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
+                    <li><a href="index.html" class="hover:text-gray-300 transition duration-300">Home</a></li>
+                    <li><a href="homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+                    <li><a href="shows.html"
+                            class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Shows</a>
+                    </li>
+                    <li><a href="booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
+                            History</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main class="flex-grow flex justify-center items-center">
+        <div class="confirmation-box bg-white p-6 rounded-xl shadow-lg text-center max-w-xl w-full my-6">
+            <h2 class="text-2xl font-bold mb-6 text-green-600">✅ Booking Confirmed!</h2>
+            <p class="mb-4">Your ticket has been booked successfully.</p>
+
+            <div class="details space-y-2 text-left p-4 bg-gray-50 rounded-lg">
+                <p class="text-sm sm:text-base"><strong>Booking ID:</strong> <span id="bookingId"
+                        class="font-normal text-gray-600"></span></p>
+                <p class="text-sm sm:text-base"><strong>Movie:</strong> <span id="movieName"
+                        class="font-normal text-gray-600"></span></p>
+                <p class="text-sm sm:text-base"><strong>Showtime:</strong> <span id="showTime"
+                        class="font-normal text-gray-600"></span></p>
+                <p class="text-sm sm:text-base"><strong>Seats:</strong> <span id="seats"
+                        class="font-normal text-gray-600"></span></p>
+                <p class="text-sm sm:text-base"><strong>Total Paid:</strong> ₹<span id="amount"
+                        class="font-normal text-gray-600"></span></p>
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-4 mt-6">
+                <button id="downloadBtn"
+                    class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    ⬇ Download Ticket
+                </button>
+                <button id="homeBtn"
+                    class="w-full py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+                    🏠 Home
+                </button>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const token = localStorage.getItem("token");
+        if (!token) window.location.href = "/login.html";
+
+        const params = new URLSearchParams(window.location.search);
+        const bookingId = params.get("bookingId");
+
+        // Get references to summary elements
+        const bookingIdEl = document.getElementById("bookingId");
+        const movieNameEl = document.getElementById("movieName");
+        const showTimeEl = document.getElementById("showTime");
+        const seatsEl = document.getElementById("seats");
+        const amountEl = document.getElementById("amount");
+
+        // Fetch booking details from the backend using the bookingId
+        async function fetchBookingDetails() {
+            try {
+                const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                if (!response.ok) throw new Error("Could not fetch booking details.");
+
+                const booking = await response.json();
+
+                // Populate the page with the fetched data
+                bookingIdEl.textContent = booking.bookingId;
+                showTimeEl.textContent = booking.time;
+                seatsEl.textContent = booking.seats.join(", ");
+                amountEl.textContent = booking.amount;
+
+                // Fetch movie details separately
+                const movieResponse = await fetch(`http://localhost:8080/api/movies/${booking.movieId}`, {
+                    headers: { "Authorization": "Bearer " + token }
+                });
+                const movie = await movieResponse.json();
+                movieNameEl.textContent = movie.title;
+
+            } catch (error) {
+                console.error("Error fetching booking details:", error);
+                // Fallback to localStorage data if API fails
+                bookingIdEl.textContent = bookingId;
+                showTimeEl.textContent = localStorage.getItem("showTime") || "N/A";
+                seatsEl.textContent = JSON.parse(localStorage.getItem("selectedSeats"))?.join(", ") || "N/A";
+                amountEl.textContent = localStorage.getItem("totalPrice") || "N/A";
+                movieNameEl.textContent = localStorage.getItem("movieTitle") || "N/A";
+            }
+        }
+
+        // Download Ticket (basic text file for now)
+        document.getElementById("downloadBtn").addEventListener("click", () => {
+            const ticketData = `
+        Booking ID: ${bookingIdEl.textContent}
+        Movie: ${movieNameEl.textContent}
+        Showtime: ${showTimeEl.textContent}
+        Seats: ${seatsEl.textContent}
+        Amount Paid: ₹${amountEl.textContent}
+      `;
+            const blob = new Blob([ticketData], { type: "text/plain" });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = `Ticket_${bookingId}.txt`;
+            link.click();
+        });
+
+        // Go to Home
+        document.getElementById("homeBtn").addEventListener("click", () => {
+            window.location.href = "/shows.html";
+        });
+
+        // Logout
+        document.getElementById("logoutBtn").addEventListener("click", () => {
+            localStorage.clear();
+            window.location.href = "/login.html";
+        });
+
+        fetchBookingDetails();
+    </script>
+</body>
+
+</html>

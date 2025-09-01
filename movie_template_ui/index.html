@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cineverse - Your Movie Hub</title>
+    <!-- Use Tailwind CSS for a modern, responsive design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f6f9;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+    <!-- Header & Navigation -->
+    <header class="bg-gray-900 text-white shadow-lg">
+        <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center">
+            <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse</h1>
+            <!-- Changed to a button and added an ID for JavaScript -->
+            <button id="loginBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105">
+                Login / Signup
+            </button>
+        </div>
+        <!-- Navbar -->
+        <div class="bg-gray-800 text-white shadow-md w-full">
+            <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
+                <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
+                    <li><a href="index.html" class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Home</a></li>
+                    <li><a href="homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow container mx-auto px-4 py-8">
+
+        <!-- Welcome Section -->
+        <section class="text-center my-12 bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Welcome to Cineverse</h2>
+            <p class="text-lg text-gray-600 leading-relaxed">
+                Discover the magic of cinema and book your tickets effortlessly. Explore the latest blockbusters and reserve your seats with just a few clicks.
+            </p>
+        </section>
+
+        <!-- Upcoming Movies Section -->
+        <section class="my-12">
+            <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">Upcoming Movies</h2>
+            
+            <!-- Grid for Movie Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+
+                <!-- Movie Card 1 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-2xl transform hover:scale-105">
+                    <img src="https://placehold.co/400x600/103a6a/FFFFFF?text=THE+LEGEND+OF+AURORA" alt="Movie Poster" class="w-full h-96 object-cover">
+                    <div class="p-5">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">The Legend of Aurora</h3>
+                        <p class="text-gray-600 text-sm">A thrilling tale of a warrior's quest to save her kingdom from an ancient curse.</p>
+                        <span class="inline-block bg-purple-200 text-purple-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mt-3">Adventure</span>
+                    </div>
+                </div>
+
+                <!-- Movie Card 2 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-2xl transform hover:scale-105">
+                    <img src="https://placehold.co/400x600/6a1010/FFFFFF?text=GALACTIC+FRONTIERS" alt="Movie Poster" class="w-full h-96 object-cover">
+                    <div class="p-5">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">Galactic Frontiers</h3>
+                        <p class="text-gray-600 text-sm">Humanity ventures into the great unknown, facing both wonders and peril in a distant galaxy.</p>
+                        <span class="inline-block bg-red-200 text-red-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mt-3">Sci-Fi</span>
+                    </div>
+                </div>
+
+                <!-- Movie Card 3 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-2xl transform hover:scale-105">
+                    <img src="https://placehold.co/400x600/2a6a10/FFFFFF?text=ECHOES+OF+THE+PAST" alt="Movie Poster" class="w-full h-96 object-cover">
+                    <div class="p-5">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">Echoes of the Past</h3>
+                        <p class="text-gray-600 text-sm">A historical drama that uncovers long-lost secrets, changing the course of a family forever.</p>
+                        <span class="inline-block bg-green-200 text-green-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mt-3">Drama</span>
+                    </div>
+                </div>
+
+                <!-- Movie Card 4 -->
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition duration-300 hover:shadow-2xl transform hover:scale-105">
+                    <img src="https://placehold.co/400x600/106a6a/FFFFFF?text=SHADOW+OF+THE+CRYPT" alt="Movie Poster" class="w-full h-96 object-cover">
+                    <div class="p-5">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">Shadow of the Crypt</h3>
+                        <p class="text-gray-600 text-sm">A paranormal investigator confronts a sinister presence in an abandoned ancient crypt.</p>
+                        <span class="inline-block bg-teal-200 text-teal-800 text-xs font-semibold px-2.5 py-0.5 rounded-full mt-3">Horror</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white text-center py-6 mt-12">
+        <p>&copy; 2025 Cineverse. All rights reserved.</p>
+    </footer>
+
+    <!-- JavaScript to handle button click -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loginBtn = document.getElementById('loginBtn');
+
+            // Add a click event listener to the button
+            loginBtn.addEventListener('click', () => {
+                // Redirect the user to the login.html page
+                window.location.href = 'login.html';
+            });
+        });
+    </script>
+</body>
+</html>

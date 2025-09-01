@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - User Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header and Navigation -->
+  <header class="bg-gray-900 text-white shadow-lg w-full">
+    <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between">
+      <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse Admin</h1>
+      <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
+        Logout
+      </button>
+    </div>
+    <div class="bg-gray-800 text-white shadow-md w-full">
+      <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
+        <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
+          <li><a href="admin-dashboard.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+          <li><a href="admin-users.html" class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Users</a></li>
+          <li><a href="admin-movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
+          <li><a href="admin-shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-grow p-6 sm:p-10">
+    <div class="max-w-7xl mx-auto space-y-8">
+      <h2 class="text-3xl font-bold text-gray-800">👥 User Management</h2>
+
+      <!-- Create / Update Form -->
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Create / Update User</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <input type="hidden" id="userId">
+          <input type="text" id="username" placeholder="Username" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="password" id="password" placeholder="Password" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select id="role" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="USER">USER</option>
+            <option value="ADMIN">ADMIN</option>
+          </select>
+          <button onclick="saveUser()" class="col-span-1 md:col-span-2 lg:col-span-3 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            💾 Save User
+          </button>
+        </div>
+      </div>
+
+      <!-- Users Table -->
+      <div class="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">All Users</h3>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-blue-600 text-white">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Username</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Role</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTable" class="bg-white divide-y divide-gray-200">
+            <!-- User rows will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = localStorage.getItem("token");
+    if (!token) window.location.href = "/login.html";
+
+    function fetchUsers() {
+      fetch("http://localhost:8080/api/admin/users", {
+        headers: { "Authorization": "Bearer " + token }
+      })
+      .then(res => res.json())
+      .then(data => {
+        const table = document.getElementById("userTable");
+        table.innerHTML = "";
+        data.forEach(u => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.id}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${u.username}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.role}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button onclick="editUser(${u.id},'${u.username}','${u.role}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
+              <button onclick="deleteUser(${u.id})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
+            </td>
+          `;
+          table.appendChild(row);
+        });
+      });
+    }
+
+    function saveUser() {
+      const id = document.getElementById("userId").value;
+      const user = {
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+        role: document.getElementById("role").value
+      };
+      let url = "http://localhost:8080/api/admin/users";
+      let method = "POST";
+      if (id) { url += "/" + id; method = "PUT"; }
+
+      fetch(url, {
+        method: method,
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        body: JSON.stringify(user)
+      }).then(() => { fetchUsers(); resetForm(); });
+    }
+
+    function editUser(id, username, role) {
+      document.getElementById("userId").value = id;
+      document.getElementById("username").value = username;
+      document.getElementById("role").value = role;
+    }
+
+    function deleteUser(id) {
+      fetch("http://localhost:8080/api/admin/users/" + id, {
+        method: "DELETE",
+        headers: { "Authorization": "Bearer " + token }
+      }).then(() => fetchUsers());
+    }
+
+    function resetForm() {
+      document.getElementById("userId").value = "";
+      document.getElementById("username").value = "";
+      document.getElementById("password").value = "";
+      document.getElementById("role").value = "USER";
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      localStorage.clear();
+      window.location.href = "/login.html";
+    });
+
+    fetchUsers();
+  </script>
+</body>
+</html>
