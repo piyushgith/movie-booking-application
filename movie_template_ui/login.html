@@ -89,7 +89,8 @@
                 sessionStorage.setItem("rememberMe", rememberMe);
 
                 if (role === "ADMIN") {
-                    window.location.href = "admin-dashboard.html";
+                    window.location.href = "/admin/admin-dashboard.html";
+                    console.log("Admin logged in");
                 } else {
                     window.location.href = "homepage.html";
                 }

@@ -8,6 +8,8 @@ import com.micro.piyush.movie.request.MovieRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MovieService {
 
@@ -26,6 +28,15 @@ public class MovieService {
         return "The movie has been added successfully";
     }
 
+    public List<Movie> findAllMovies() {
+        return movieRepository.findAll();
+    }
+
+    public Movie updateMovie(Movie movieRequest) {
+
+
+        return movieRequest;
+    }
 
 
 }
