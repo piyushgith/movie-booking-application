@@ -1,6 +1,6 @@
 package com.micro.piyush.movie.enums;
 
-public enum Genre {
+public enum GenreType {
     DRAMA,
     THRILLER,
     ACTION,

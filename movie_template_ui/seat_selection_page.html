@@ -211,8 +211,8 @@
 
         // Add logout functionality
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('role');
+            sessionStorage.clear(); // Clear all session data
+            localStorage.clear(); // Clear all local storage data
             window.location.href = '/login.html';
         });
 

@@ -34,9 +34,9 @@ public class SecurityConfiguration {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .csrf(c -> c.disable())
-                //.csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"))
-                //.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+                //.csrf(c -> c.disable())
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/user/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"))
+                .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(req -> req
                         .anyRequest().permitAll() // Allow all requests without authentication
                 )

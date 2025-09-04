@@ -1,34 +1,27 @@
 package com.micro.piyush.movie.entity;
 
+import com.micro.piyush.movie.enums.LocationType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
-
-@Entity
-@Table(name = "THEATERS")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "theaters")
 public class Theater {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(nullable = false, unique = true)
     private String name;
 
-    @Column(unique = true)
     private String address;
 
-    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)
-    private List<TheaterSeat> theaterSeatList = new ArrayList<>();
-
-    @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL)
-    private List<Show> showList = new ArrayList<>();
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private LocationType location;
 }

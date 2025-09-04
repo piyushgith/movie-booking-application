@@ -9,8 +9,8 @@ public class MovieMapper {
         Movie movie = Movie.builder()
                 .movieName(movieRequest.getMovieName())
                 .duration(movieRequest.getDuration())
-                .genre(movieRequest.getGenre())
-                .language(movieRequest.getLanguage())
+                .genre(movieRequest.getGenreType())
+                .language(movieRequest.getLanguageType())
                 .releaseDate(movieRequest.getReleaseDate())
                 .rating(movieRequest.getRating())
                 .build();

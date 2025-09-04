@@ -42,7 +42,7 @@ public class TheaterService {
 
         Theater theater = theaterRepository.findByAddress(address);
 
-        List<TheaterSeat> seatList = theater.getTheaterSeatList();
+        //List<TheaterSeat> seatList = theater.getTheaterSeatList();
 
         int counter = 1;
         int fill = 0;
@@ -63,7 +63,7 @@ public class TheaterService {
             theaterSeat.setSeatNo(seatNo);
             theaterSeat.setSeatType(SeatType.CLASSIC);
             theaterSeat.setTheater(theater);
-            seatList.add(theaterSeat);
+            //seatList.add(theaterSeat);
         }
 
         for (int i = 1; i <= noOfPremiumSeats; i++) {
@@ -81,7 +81,7 @@ public class TheaterService {
             theaterSeat.setSeatNo(seatNo);
             theaterSeat.setSeatType(SeatType.PREMIUM);
             theaterSeat.setTheater(theater);
-            seatList.add(theaterSeat);
+            //seatList.add(theaterSeat);
         }
 
         theaterRepository.save(theater);

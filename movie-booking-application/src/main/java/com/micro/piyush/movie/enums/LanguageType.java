@@ -1,6 +1,6 @@
 package com.micro.piyush.movie.enums;
 
-public enum Language {
+public enum LanguageType {
     HINDI,
     ENGLISH,
     TELUGU,

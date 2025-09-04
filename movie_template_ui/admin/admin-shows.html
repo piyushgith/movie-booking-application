@@ -172,7 +172,8 @@
     }
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.clear();
+      sessionStorage.clear(); // Clear all session data
+      localStorage.clear(); // Clear all local storage data
       window.location.href = "/login.html";
     });
 

@@ -2,14 +2,14 @@ package com.micro.piyush.movie.request;
 
 import lombok.Data;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 @Data
 public class ShowRequest {
 
-    private Time showStartTime;
-    private Date showDate;
+    private LocalTime showStartTime;
+    private LocalDate showDate;
     private Integer theaterId;
     private Integer movieId;
 }

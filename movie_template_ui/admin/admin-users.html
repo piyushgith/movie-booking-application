@@ -45,7 +45,7 @@
         <h3 class="text-xl font-semibold text-gray-800 mb-4">Create / Update User</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <input type="hidden" id="userId">
-          <input type="text" id="username" placeholder="Username" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="email" placeholder="Email" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <input type="password" id="password" placeholder="Password" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <select id="role" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="USER">USER</option>
@@ -64,7 +64,7 @@
           <thead class="bg-blue-600 text-white">
             <tr>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">ID</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Username</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Email</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Role</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Actions</th>
             </tr>
@@ -93,10 +93,10 @@
           const row = document.createElement("tr");
           row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.id}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${u.username}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${u.email}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.role}</td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button onclick="editUser(${u.id},'${u.username}','${u.role}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
+              <button onclick="editUser(${u.id},'${u.email}','${u.role}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
               <button onclick="deleteUser(${u.id})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
             </td>
           `;
@@ -123,9 +123,9 @@
       }).then(() => { fetchUsers(); resetForm(); });
     }
 
-    function editUser(id, username, role) {
+    function editUser(id, email, role) {
       document.getElementById("userId").value = id;
-      document.getElementById("username").value = username;
+      document.getElementById("email").value = email;
       document.getElementById("role").value = role;
     }
 
@@ -138,13 +138,14 @@
 
     function resetForm() {
       document.getElementById("userId").value = "";
-      document.getElementById("username").value = "";
+      document.getElementById("email").value = "";
       document.getElementById("password").value = "";
       document.getElementById("role").value = "USER";
     }
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      localStorage.clear();
+      sessionStorage.clear(); // Clear all session data
+      localStorage.clear(); // Clear all local storage data
       window.location.href = "/login.html";
     });
 

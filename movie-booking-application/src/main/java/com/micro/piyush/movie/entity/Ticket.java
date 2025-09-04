@@ -1,39 +1,34 @@
 package com.micro.piyush.movie.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
+import lombok.*;
 
-import java.sql.Date;
+import java.time.LocalDate;
 
-@Entity
-@Table(name = "TICKETS")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "tickets")
 public class Ticket {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "ticket_id")
     private Integer ticketId;
 
+    private LocalDate bookedAt;
+
+    @Column(nullable = false)
     private Integer totalTicketsPrice;
 
-    private String bookedSeats;
-
-    @CreationTimestamp
-    private Date bookedAt;
-
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "show_id", nullable = false)
     private Show show;
 
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
 }

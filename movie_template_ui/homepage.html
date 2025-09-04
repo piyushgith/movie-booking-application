@@ -125,14 +125,14 @@
     </footer>
 
     <script>
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) {
             window.location.href = "login.html";
         }
 
         document.getElementById('logoutBtn').addEventListener('click', () => {
-            localStorage.removeItem("token");
-            localStorage.removeItem("role"); // Also remove the role for a clean logout
+            sessionStorage.clear(); // Clear all session data
+            localStorage.clear(); // Clear all local storage data
             window.location.href = "index.html";
         });
     </script>

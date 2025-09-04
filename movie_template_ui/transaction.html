@@ -114,15 +114,15 @@
     </main>
 
     <script>
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) window.location.href = "/login.html";
 
         const params = new URLSearchParams(window.location.search);
         const movieId = params.get("movieId");
         const time = params.get("time");
 
-        const seats = JSON.parse(localStorage.getItem("selectedSeats")) || [];
-        const totalPrice = localStorage.getItem("totalPrice");
+        const seats = JSON.parse(sessionStorage.getItem("selectedSeats")) || [];
+        const totalPrice = sessionStorage.getItem("totalPrice");
 
         // Get references to summary elements
         const movieNameEl = document.getElementById("movieName");
@@ -163,7 +163,8 @@
 
         // Logout
         document.getElementById("logoutBtn").addEventListener("click", () => {
-            localStorage.clear();
+            sessionStorage.clear(); // Clear all session data
+            localStorage.clear(); // Clear all local storage data
             window.location.href = "/login.html";
         });
 

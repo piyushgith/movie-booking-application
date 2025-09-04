@@ -17,7 +17,7 @@ public class MovieService {
     public String addMovie(MovieRequest movieRequest) {
         Movie movieByName = movieRepository.findByMovieName(movieRequest.getMovieName());
 
-        if (movieByName != null && movieByName.getLanguage().equals(movieRequest.getLanguage())) {
+        if (movieByName != null && movieByName.getLanguage().equals(movieRequest.getLanguageType())) {
             throw new MovieAlreadyExist();
         }
         Movie movie = MovieMapper.movieDtoToMovie(movieRequest);
@@ -25,5 +25,7 @@ public class MovieService {
         movieRepository.save(movie);
         return "The movie has been added successfully";
     }
+
+
 
 }

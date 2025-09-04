@@ -7,7 +7,7 @@ import com.micro.piyush.movie.response.TicketResponse;
 public class TicketMapper {
     public static TicketResponse returnTicket(Show show, Ticket ticket) {
         TicketResponse ticketResponseDto = TicketResponse.builder()
-                .bookedSeats(ticket.getBookedSeats())
+                //.bookedSeats(ticket.getBookedSeats())
                 .address(show.getTheater().getAddress())
                 .theaterName(show.getTheater().getName())
                 .movieName(show.getMovie().getMovieName())

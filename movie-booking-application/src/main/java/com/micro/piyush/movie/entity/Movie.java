@@ -1,57 +1,39 @@
 package com.micro.piyush.movie.entity;
 
+import com.micro.piyush.movie.enums.GenreType;
+import com.micro.piyush.movie.enums.LanguageType;
+import jakarta.persistence.*;
+import lombok.*;
 
-import java.sql.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDate;
 
-
-import com.micro.piyush.movie.enums.Genre;
-import com.micro.piyush.movie.enums.Language;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-
-@Entity
-@Table(name = "MOVIES")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "movies")
 public class Movie {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String movieName;
 
+    @Column(nullable = false)
     private Integer duration;
 
-    @Column(scale = 2)
-    private Double rating;
+    @Enumerated(EnumType.STRING)
+    private GenreType genre;
 
-    private Date releaseDate;
+    @Enumerated(EnumType.STRING)
+    private LanguageType language;
 
-    @Enumerated(value = EnumType.STRING)
-    private Genre genre;
+    @Column(nullable = false)
+    private Float rating;
 
-    @Enumerated(value = EnumType.STRING)
-    private Language language;
+    private LocalDate releaseDate;
 
-    @OneToMany(mappedBy = "movie",cascade = CascadeType.ALL)
-    private List<Show> shows = new ArrayList<>();
 }
-

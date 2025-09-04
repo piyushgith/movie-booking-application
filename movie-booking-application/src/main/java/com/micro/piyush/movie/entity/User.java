@@ -1,49 +1,50 @@
 package com.micro.piyush.movie.entity;
 
-import com.micro.piyush.movie.enums.Gender;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.micro.piyush.movie.enums.GenderType;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
 
-
-
-@Entity
-@Table(name = "USERS")
-@Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@Setter
+@Getter
+@Entity
+@Table(name = "users")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Integer id;
 
-    @Column(nullable = false)
-    private String name;
-
-    private Integer age;
-
+    @Column(name = "address")
     private String address;
 
-    @Enumerated(value = EnumType.STRING)
-    private Gender gender;
+    @Column(name = "age")
+    private Integer age;
 
-    private String mobileNo;
-
-    @Column(unique = true)
+    @Column(name = "email_id", nullable = false, unique = true)
     private String emailId;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "gender")
+    private GenderType gender;
+
+    @Column(name = "mobile_no", nullable = false, unique = true)
+    private String mobileNo;
+
+    @Column(name = "name", nullable = false)
+    private String name;
+
+    @Column(name = "password", nullable = false)
     private String password;
 
-    private String roles;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // This side is serialized
+    private Set<UserRole> userRoles;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Ticket> ticketList = new ArrayList<>();
 }
-

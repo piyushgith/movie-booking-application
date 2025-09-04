@@ -77,8 +77,8 @@
     </footer>
 
     <script>
-        const token = localStorage.getItem("token");
-        const role = localStorage.getItem("role");
+        const token = sessionStorage.getItem("token");
+        const role = sessionStorage.getItem("role");
 
         if (!token) {
             window.location.href = "login.html"; // redirect if not logged in
@@ -92,7 +92,8 @@
 
         // Logout function
         logoutBtn.addEventListener("click", () => {
-            localStorage.clear();
+            sessionStorage.clear(); // Clear all session data
+            localStorage.clear(); // Clear all local storage data
             window.location.href = "login.html";
         });
 

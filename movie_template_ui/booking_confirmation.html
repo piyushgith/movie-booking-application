@@ -76,7 +76,7 @@
     </main>
 
     <script>
-        const token = localStorage.getItem("token");
+        const token = sessionStorage.getItem("token");
         if (!token) window.location.href = "/login.html";
 
         const params = new URLSearchParams(window.location.search);
@@ -116,10 +116,10 @@
                 console.error("Error fetching booking details:", error);
                 // Fallback to localStorage data if API fails
                 bookingIdEl.textContent = bookingId;
-                showTimeEl.textContent = localStorage.getItem("showTime") || "N/A";
-                seatsEl.textContent = JSON.parse(localStorage.getItem("selectedSeats"))?.join(", ") || "N/A";
-                amountEl.textContent = localStorage.getItem("totalPrice") || "N/A";
-                movieNameEl.textContent = localStorage.getItem("movieTitle") || "N/A";
+                showTimeEl.textContent = sessionStorage.getItem("showTime") || "N/A";
+                seatsEl.textContent = JSON.parse(sessionStorage.getItem("selectedSeats"))?.join(", ") || "N/A";
+                amountEl.textContent = sessionStorage.getItem("totalPrice") || "N/A";
+                movieNameEl.textContent = sessionStorage.getItem("movieTitle") || "N/A";
             }
         }
 
@@ -146,7 +146,8 @@
 
         // Logout
         document.getElementById("logoutBtn").addEventListener("click", () => {
-            localStorage.clear();
+            sessionStorage.clear(); // Clear all session data
+            localStorage.clear(); // Clear all local storage data
             window.location.href = "/login.html";
         });
 

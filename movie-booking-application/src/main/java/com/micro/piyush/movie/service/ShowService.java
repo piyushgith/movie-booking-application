@@ -49,8 +49,8 @@ public class ShowService {
         show.setTheater(theater);
         show = showRepository.save(show);
 
-        movie.getShows().add(show);
-        theater.getShowList().add(show);
+//        movie.getShows().add(show);
+//        theater.getShowList().add(show);
 
         movieRepository.save(movie);
         theaterRepository.save(theater);
@@ -68,26 +68,26 @@ public class ShowService {
         Show show = showOpt.get();
         Theater theater = show.getTheater();
 
-        List<TheaterSeat> theaterSeatList = theater.getTheaterSeatList();
-        List<ShowSeat> showSeatList = show.getShowSeatList();
-
-        for (TheaterSeat theaterSeat : theaterSeatList) {
-            ShowSeat showSeat = new ShowSeat();
-            showSeat.setSeatNo(theaterSeat.getSeatNo());
-            showSeat.setSeatType(theaterSeat.getSeatType());
-
-            if (showSeat.getSeatType().equals(SeatType.CLASSIC)) {
-                showSeat.setPrice((showSeatRequest.getPriceOfClassicSeat()));
-            } else {
-                showSeat.setPrice(showSeatRequest.getPriceOfPremiumSeat());
-            }
-
-            showSeat.setShow(show);
-            showSeat.setIsAvailable(Boolean.TRUE);
-            showSeat.setIsFoodContains(Boolean.FALSE);
-
-            showSeatList.add(showSeat);
-        }
+//        List<TheaterSeat> theaterSeatList = theater.getTheaterSeatList();
+//        List<ShowSeat> showSeatList = show.getShowSeatList();
+//
+//        for (TheaterSeat theaterSeat : theaterSeatList) {
+//            ShowSeat showSeat = new ShowSeat();
+//            showSeat.setSeatNo(theaterSeat.getSeatNo());
+//            showSeat.setSeatType(theaterSeat.getSeatType());
+//
+//            if (showSeat.getSeatType().equals(SeatType.CLASSIC)) {
+//                showSeat.setPrice((showSeatRequest.getPriceOfClassicSeat()));
+//            } else {
+//                showSeat.setPrice(showSeatRequest.getPriceOfPremiumSeat());
+//            }
+//
+//            showSeat.setShow(show);
+//            showSeat.setIsAvailable(Boolean.TRUE);
+//            showSeat.setIsFoodContains(Boolean.FALSE);
+//
+//            showSeatList.add(showSeat);
+//        }
 
         showRepository.save(show);
         return "Show seats have been associated successfully";

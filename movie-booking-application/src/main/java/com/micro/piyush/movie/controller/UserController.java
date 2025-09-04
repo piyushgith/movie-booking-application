@@ -1,6 +1,9 @@
 package com.micro.piyush.movie.controller;
 
 
+import com.micro.piyush.movie.entity.User;
+import com.micro.piyush.movie.response.JWTTokenResponse;
+import com.micro.piyush.movie.response.UserResponse;
 import com.micro.piyush.movie.service.JWTService;
 import com.micro.piyush.movie.request.AuthRequest;
 import com.micro.piyush.movie.request.UserRequest;
@@ -13,6 +16,9 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Optional;
 
 
 @RestController
@@ -30,24 +36,42 @@ public class UserController {
     private JWTService jwtService;
 
     @PostMapping("/addNew")
-    public ResponseEntity<String> addNewUser(@RequestBody UserRequest userEntryDto) {
+    public ResponseEntity<Object> addNewUser(@RequestBody UserRequest userEntryDto) {
         try {
-            String result = userService.addUser(userEntryDto);
+            User result = userService.addUser(userEntryDto);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (Exception e) {
+            // Return a ResponseEntity with the error message and a BAD_REQUEST status
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 
     @PostMapping("/getToken")
-    public String authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
+    public JWTTokenResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
-
+        String[] role = null;
         if (authentication.isAuthenticated()) {
-            return jwtService.generateToken(authRequest.getUsername());
+            Optional<User> user = userService.findUser(authRequest.getUsername());
+            if (user.isPresent())
+                role = user.get().getUserRoles().stream()
+                        .map(userRole -> userRole.getId().getRole())
+                        .toArray(String[]::new);
+            if (role.length > 0) {
+                return new JWTTokenResponse(jwtService.generateToken(authRequest.getUsername()), role[0]);
+            }
         }
-
         throw new UsernameNotFoundException("invalid user details.");
     }
+
+    @GetMapping("/allUsers")
+    public List<UserResponse> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @PutMapping("/updateUser")
+    public UserResponse updateUser(@RequestBody UserRequest userEntryDto) {
+        return userService.updateUser(userEntryDto);
+    }
+
 }

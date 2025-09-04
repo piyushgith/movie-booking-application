@@ -2,8 +2,8 @@ package com.micro.piyush.movie.response;
 
 import lombok.*;
 
-import java.sql.Date;
-import java.sql.Time;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 
 @Data
@@ -12,8 +12,8 @@ import java.sql.Time;
 @ToString
 @Builder
 public class TicketResponse {
-    private Time time;
-    private Date date;
+    private LocalTime time;
+    private LocalDate date;
     private String movieName;
     private String theaterName;
     private String address;
