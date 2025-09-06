@@ -22,7 +22,7 @@ public class TheaterSeat {
     @Enumerated(EnumType.STRING)
     private SeatType seatType;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theater_id", nullable = false)
     private Theater theater;
 }

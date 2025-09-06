@@ -10,6 +10,7 @@ import java.time.LocalDate;
 
 @Data
 public class MovieRequest {
+    private Integer id;
     private String movieName;
     private Integer duration;
     private Float rating;

@@ -68,7 +68,7 @@ public class UserService {
         // Create the composite key for the UserRole entity.
         UserRoleId userRoleId = new UserRoleId();
         userRoleId.setUserId(savedUser.getId());
-        userRoleId.setRole(userRequest.getRoles());
+        userRoleId.setRole(userRequest.getRole());
 
         // Create the UserRole entity itself.
         UserRole userRole = new UserRole();

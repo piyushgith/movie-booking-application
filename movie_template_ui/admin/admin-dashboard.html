@@ -62,12 +62,12 @@
 
   <script>
     const token = sessionStorage.getItem("token");
-    if (!token) window.location.href = "/login.html";
+    if (!token) window.location.href = "/login_animation.html";
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
       sessionStorage.clear(); // Clear all session data
       localStorage.clear(); // Clear all local storage data
-      window.location.href = "/login.html";
+      window.location.href = "/login_animation.html";
     });
   </script>
 </body>

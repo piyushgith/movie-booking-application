@@ -49,16 +49,16 @@ public class UserController {
     @PostMapping("/getToken")
     public JWTTokenResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword()));
+                new UsernamePasswordAuthenticationToken(authRequest.getEmailId(), authRequest.getPassword()));
         String[] role = null;
         if (authentication.isAuthenticated()) {
-            Optional<User> user = userService.findUser(authRequest.getUsername());
+            Optional<User> user = userService.findUser(authRequest.getEmailId());
             if (user.isPresent())
                 role = user.get().getUserRoles().stream()
                         .map(userRole -> userRole.getId().getRole())
                         .toArray(String[]::new);
             if (role.length > 0) {
-                return new JWTTokenResponse(jwtService.generateToken(authRequest.getUsername()), role[0]);
+                return new JWTTokenResponse(jwtService.generateToken(authRequest.getEmailId()), role[0]);
             }
         }
         throw new UsernameNotFoundException("invalid user details.");

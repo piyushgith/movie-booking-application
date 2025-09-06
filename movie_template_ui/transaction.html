@@ -116,7 +116,11 @@
 
     <script>
         const token = sessionStorage.getItem("token");
-        if (!token) window.location.href = "/login.html";
+        const role = sessionStorage.getItem("role");
+
+        if (!token) {
+            window.location.href = "login_animation.html"; // redirect if not logged in
+        }
 
         const params = new URLSearchParams(window.location.search);
         const movieId = params.get("movieId");

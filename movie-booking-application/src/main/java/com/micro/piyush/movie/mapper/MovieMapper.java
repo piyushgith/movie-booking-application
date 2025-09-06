@@ -14,7 +14,11 @@ public class MovieMapper {
                 .releaseDate(movieRequest.getReleaseDate())
                 .rating(movieRequest.getRating())
                 .build();
-
+        if (null != movieRequest.getId() || 0 == movieRequest.getId()) {
+            movie.setId(movieRequest.getId());
+        }
         return movie;
     }
+
+
 }
