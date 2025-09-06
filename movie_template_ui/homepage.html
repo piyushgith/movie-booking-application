@@ -14,6 +14,12 @@
         body {
             font-family: 'Inter', sans-serif;
         }
+        .icon-gradient {
+            background: linear-gradient(135deg, currentColor 0%, currentColor 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
     </style>
 </head>
 
@@ -58,34 +64,27 @@
             <h2 class="text-3xl font-bold text-gray-800 text-center mb-8">Your Dashboard</h2>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
 
-                <!-- Card for browsing movies -->
-                <a href=#
-                    class="bg-white p-8 rounded-2xl shadow-lg text-center transition duration-300 hover:shadow-2xl hover:scale-105 transform">
-                    <div class="text-indigo-600 mb-4">
-                        <!-- Home Icon SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-16 h-16 mx-auto">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125h9.75a1.125 1.125 0 001.125-1.125V9.75M8.25 21h8.25" />
-                        </svg>
+                <!-- Card for Movies -->
+                <a href="movies.html"
+                    class="bg-white p-8 rounded-2xl shadow-lg text-center transition duration-300 hover:shadow-2xl hover:scale-105 transform group">
+                    <div class="text-indigo-600 mb-4 transition-all duration-300 group-hover:scale-110">
+                        <!-- Star Icon using Unicode and Tailwind -->
+                        <div class="text-6xl font-bold">
+                            🎥
+                        </div>
                     </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2">Home</h3>
-                    <p class="text-gray-600 text-sm">General Info & Special offers</p>
+                    <h3 class="text-xl font-bold text-gray-800 mb-2">Movies</h3>
+                    <p class="text-gray-600 text-sm">General Info</p>
                 </a>
 
                 <!-- Card for finding shows -->
                 <a href="shows.html"
-                    class="bg-white p-8 rounded-2xl shadow-lg text-center transition duration-300 hover:shadow-2xl hover:scale-105 transform">
-                    <div class="text-green-600 mb-4">
-                        <!-- Film Icon SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-16 h-16 mx-auto">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15" />
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M17.25 12h5.25a3.75 3.75 0 000-7.5H18m0 7.5a3.75 3.75 0 01-7.5 0M18 12h5.25a3.75 3.75 0 000-7.5H18m0 7.5a3.75 3.75 0 01-7.5 0" />
-                        </svg>
+                    class="bg-white p-8 rounded-2xl shadow-lg text-center transition duration-300 hover:shadow-2xl hover:scale-105 transform group">
+                    <div class="text-green-600 mb-4 transition-all duration-300 group-hover:scale-110">
+                        <!-- Film/Cinema Icon using Unicode -->
+                        <div class="text-6xl font-bold">
+                            🎬
+                        </div>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">Shows</h3>
                     <p class="text-gray-600 text-sm">Browse movies & Find movies by location</p>
@@ -93,14 +92,12 @@
 
                 <!-- Card for booking history -->
                 <a href="booking-history.html"
-                    class="bg-white p-8 rounded-2xl shadow-lg text-center transition duration-300 hover:shadow-2xl hover:scale-105 transform">
-                    <div class="text-red-600 mb-4">
-                        <!-- History Icon SVG -->
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                            stroke="currentColor" class="w-16 h-16 mx-auto">
-                            <path stroke-linecap="round" stroke-linejoin="round"
-                                d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
+                    class="bg-white p-8 rounded-2xl shadow-lg text-center transition duration-300 hover:shadow-2xl hover:scale-105 transform group">
+                    <div class="text-red-600 mb-4 transition-all duration-300 group-hover:scale-110">
+                        <!-- Ticket Icon using Unicode -->
+                        <div class="text-6xl font-bold">
+                            🎟️
+                        </div>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">Booking History</h3>
                     <p class="text-gray-600 text-sm">View your past bookings</p>

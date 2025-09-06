@@ -55,7 +55,7 @@ public class UserController {
             Optional<User> user = userService.findUser(authRequest.getEmailId());
             if (user.isPresent())
                 role = user.get().getUserRoles().stream()
-                        .map(userRole -> userRole.getId().getRole())
+                        .map(userRole -> userRole.getRole())
                         .toArray(String[]::new);
             if (role.length > 0) {
                 return new JWTTokenResponse(jwtService.generateToken(authRequest.getEmailId()), role[0]);

@@ -1,15 +1,15 @@
 -- Insert 10 Movies
-INSERT INTO MOVIES (ID, DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_DATE) VALUES
-(1, 120, 'ACTION', 'ENGLISH', 'Deadpool & Wolverine', 8.0, '2024-07-26'),
-(2, 150, 'DRAMA', 'HINDI', 'Narshimha', 7.8, '2024-08-15'),
-(3, 135, 'DRAMA', 'ENGLISH', 'Alien: Romulus', 7.5, '2024-08-16'),
-(4, 140, 'COMEDY', 'HINDI', 'Khel Khel Mein', 6.5, '2024-08-15'),
-(5, 130, 'THRILLER', 'ENGLISH', 'Blink Twice', 6.8, '2024-08-23'),
-(6, 145, 'ACTION', 'HINDI', 'Yodha', 6.2, '2024-03-15'),
-(7, 125, 'ANIMATION', 'ENGLISH', 'Mufasa: The Lion King', 7.0, '2024-12-20'),
-(8, 160, 'DRAMA', 'HINDI', 'Shershaah 2', 7.2, '2025-01-15'),
-(9, 110, 'COMEDY', 'ENGLISH', 'Beetlejuice Beetlejuice', 7.4, '2024-09-06'),
-(10, 155, 'DRAMA', 'ENGLISH', 'Dune: Part Three', 8.5, '2025-02-14');
+INSERT INTO MOVIES (ID, DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_DATE,MOVIE_IMAGE) VALUES
+(1, 120, 'ACTION', 'ENGLISH', 'Deadpool & Wolverine', 8.0, '2024-07-26','https://placehold.co/150x100/702963/FFFFFF?text=Deadpool+Wolverine'),
+(2, 150, 'DRAMA', 'HINDI', 'Mahavatar Narsimha', 9.8, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Mahavatar+Narsimha'),
+(3, 135, 'DRAMA', 'ENGLISH', 'Alien: Romulus', 7.5, '2024-08-16','https://placehold.co/150x100/702963/FFFFFF?text=Alien+Romulus'),
+(4, 140, 'COMEDY', 'HINDI', 'Don 2', 6.5, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Don+2'),
+(5, 130, 'THRILLER', 'ENGLISH', 'Blink Twice', 6.8, '2024-08-23','https://placehold.co/150x100/702963/FFFFFF?text=Blink+Twice'),
+(6, 145, 'ACTION', 'HINDI', 'Yodha', 6.2, '2024-03-15','https://placehold.co/150x100/702963/FFFFFF?text=Yodha'),
+(7, 125, 'ANIMATION', 'ENGLISH', 'Mufasa: The Lion King', 7.0, '2024-12-20','https://placehold.co/150x100/702963/FFFFFF?text=Mufasa'),
+(8, 160, 'DRAMA', 'HINDI', 'Shershaah 2', 7.2, '2025-01-15','https://placehold.co/150x100/702963/FFFFFF?text=Shershaah+2'),
+(9, 110, 'COMEDY', 'ENGLISH', 'Beetlejuice Beetlejuice', 7.4, '2024-09-06','https://placehold.co/150x100/702963/FFFFFF?text=Beetlejuice'),
+(10, 155, 'DRAMA', 'ENGLISH', 'Dune: Part Three', 8.5, '2025-02-14','https://placehold.co/150x100/702963/FFFFFF?text=Dune+3');
 
 -- Insert 8 Theaters (2 per location: Bangalore, Chennai, Delhi, Mumbai)
 INSERT INTO THEATERS (ID, ADDRESS,LOCATION, NAME) VALUES

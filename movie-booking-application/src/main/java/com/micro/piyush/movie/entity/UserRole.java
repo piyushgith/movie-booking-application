@@ -1,7 +1,7 @@
 package com.micro.piyush.movie.entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Builder
@@ -10,17 +10,22 @@ import lombok.*;
 @Setter
 @Getter
 @Entity
-@Table(name = "user_roles")
+@Table(name = "user_role")
+@IdClass(UserRoleId.class)
 public class UserRole {
 
-    @EmbeddedId
-    private UserRoleId id;
+    @Id
+    @Column(name = "user_id")
+    private Integer userId;
 
-    // Maps the 'userId' field from the UserRoleId composite key to the User entity's primary key
+    @Id
+    @Column(name = "role", length = 50)
+    @Size(max = 50, message = "Role cannot exceed 50 characters")
+    private String role;
+
+    // Relationship
     @ManyToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
-    @JoinColumn(name = "user_id")
-    @JsonBackReference
+    @JoinColumn(name = "user_id", insertable = false, updatable = false)
     private User user;
 
 }

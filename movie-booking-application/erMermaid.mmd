@@ -1,0 +1,75 @@
+erDiagram
+    MOVIE ||--o{ SHOW : has
+    THEATER ||--o{ SHOW : hosts
+    SHOW ||--o{ SHOW_SEAT : has
+    USER ||--o{ TICKET : books
+    SHOW ||--o{ TICKET : for
+    TICKET ||--o{ TICKET_SEAT : includes
+    SHOW_SEAT ||--o{ TICKET_SEAT : booked
+    USER ||--o{ USER_ROLE : has
+
+    MOVIE {
+        INTEGER id PK
+        INTEGER duration "NOT NULL, >0"
+        ENUM genre "genre_type"
+        ENUM language "language_type"
+        VARCHAR movie_name "NOT NULL, UNIQUE"
+        VARCHAR movie_image
+        FLOAT rating "0-10"
+        DATE release_date
+    }
+
+    THEATER {
+        INTEGER id PK
+        VARCHAR address
+        VARCHAR location "NOT NULL"
+        VARCHAR name "NOT NULL, UNIQUE"
+    }
+
+    SHOW {
+        INTEGER show_id PK
+        DATE date "NOT NULL"
+        TIME time "NOT NULL"
+        INTEGER movie_id FK "NOT NULL"
+        INTEGER theater_id FK "NOT NULL"
+    }
+
+    SHOW_SEAT {
+        INTEGER id PK
+        BOOLEAN is_available "NOT NULL, DEFAULT TRUE"
+        BOOLEAN is_food_contains
+        INTEGER price "NOT NULL, >0"
+        VARCHAR seat_no "NOT NULL, max=20"
+        ENUM seat_type "seat_type"
+        INTEGER theater_id FK "NOT NULL"
+        INTEGER show_id FK "NOT NULL"
+    }
+
+    USER {
+        INTEGER id PK
+        VARCHAR address "max=255"
+        INTEGER age
+        VARCHAR email_id "NOT NULL, UNIQUE"
+        ENUM gender "gender_type"
+        VARCHAR mobile_no "NOT NULL, UNIQUE"
+        VARCHAR name "NOT NULL"
+        VARCHAR password "NOT NULL"
+    }
+
+    USER_ROLE {
+        INTEGER user_id PK,FK
+        VARCHAR role PK "max=50"
+    }
+
+    TICKET {
+        INTEGER ticket_id PK
+        DATE booked_at
+        INTEGER total_tickets_price "NOT 0"
+        INTEGER show_id FK "NOT NULL"
+        INTEGER user_id FK "NOT NULL"
+    }
+
+    TICKET_SEAT {
+        INTEGER ticket_id PK,FK
+        INTEGER show_seat_id PK,FK
+    }

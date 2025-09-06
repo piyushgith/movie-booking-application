@@ -72,7 +72,7 @@ public class UserService {
 
         // Create the UserRole entity itself.
         UserRole userRole = new UserRole();
-        userRole.setId(userRoleId);
+        userRole.setRole(userRequest.getRole());
         userRole.setUser(savedUser);
 
         // Add the new role to the user's set of roles.

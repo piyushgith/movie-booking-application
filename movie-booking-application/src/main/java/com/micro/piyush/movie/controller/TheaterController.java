@@ -27,14 +27,4 @@ public class TheaterController {
         }
     }
 
-    @PostMapping("/addTheaterSeat")
-    public ResponseEntity<String> addTheaterSeat(@RequestBody TheaterSeatRequest entryDto) {
-        try {
-            String result = theaterService.addTheaterSeat(entryDto);
-            return new ResponseEntity<>(result, HttpStatus.CREATED);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
-    }
-
 }

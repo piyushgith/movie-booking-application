@@ -1,9 +1,12 @@
 package com.micro.piyush.movie.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Builder
 @NoArgsConstructor
@@ -11,24 +14,34 @@ import java.time.LocalDate;
 @Setter
 @Getter
 @Entity
-@Table(name = "tickets")
+@Table(name = "ticket")
 public class Ticket {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "ticket_id")
     private Integer ticketId;
 
+    @Column(name = "booked_at")
     private LocalDate bookedAt;
 
-    @Column(nullable = false)
+    @Column(name = "total_tickets_price")
+    @Min(value = 0, message = "Total price cannot be negative")
     private Integer totalTicketsPrice;
 
+    // Foreign Keys
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "show_id", nullable = false)
+    @NotNull(message = "Show is required")
     private Show show;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
+    @NotNull(message = "User is required")
     private User user;
+
+    // Relationships
+    @OneToMany(mappedBy = "ticket", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<TicketSeat> ticketSeats;
 
 }

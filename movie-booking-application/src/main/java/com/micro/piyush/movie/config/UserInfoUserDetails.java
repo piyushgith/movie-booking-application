@@ -22,7 +22,7 @@ public class UserInfoUserDetails implements UserDetails {
         password = userInfo.getPassword();
 
         String[] role = userInfo.getUserRoles().stream()
-                .map(userRole -> userRole.getId().getRole())
+                .map(userRole -> userRole.getRole())
                 .toArray(String[]::new);
 
         authorities = Arrays.stream(role)

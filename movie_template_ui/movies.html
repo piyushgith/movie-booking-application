@@ -85,24 +85,25 @@
     <!-- Header with consistent navigation -->
     <header class="bg-gray-900 text-white shadow-lg w-full">
         <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between">
-        <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse</h1>
-        <button id="logoutBtn"
-            class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
-            Logout
-        </button>
+            <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse</h1>
+            <button id="logoutBtn"
+                class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
+                Logout
+            </button>
         </div>
         <!-- Navbar -->
         <div class="bg-gray-800 text-white shadow-md w-full">
-        <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
-            <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
-            <li><a href="index.html" class="hover:text-gray-300 transition duration-300">Home</a></li>
-            <li><a href="homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
-            <li><a href="movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
-            <li><a href="shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
-            <li><a href="booking_history.html" class="hover:text-gray-300 transition duration-300">Booking History</a>
-            </li>
-            </ul>
-        </nav>
+            <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
+                <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
+                    <li><a href="index.html" class="hover:text-gray-300 transition duration-300">Home</a></li>
+                    <li><a href="homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+                    <li><a href="movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
+                    <li><a href="shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
+                    <li><a href="booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
+                            History</a>
+                    </li>
+                </ul>
+            </nav>
         </div>
     </header>
 
@@ -148,7 +149,7 @@
         </div>
     </div>
 
-
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         const token = sessionStorage.getItem("token");
         const role = sessionStorage.getItem("role");
@@ -156,7 +157,7 @@
         if (!token) {
             window.location.href = "login_animation.html"; // redirect if not logged in
         }
-        
+
         // Logout function
         logoutBtn.addEventListener("click", () => {
             sessionStorage.clear(); // Clear all session data
@@ -164,67 +165,26 @@
             window.location.href = "login_animation.html";
         });
 
+        // Replace the movies constant declaration and DOMContentLoaded event listener with:
 
-        document.addEventListener("DOMContentLoaded", () => {
-            const movies = [
-                {
-                    id: 1,
-                    movieName: "Inception",
-                    movieImage: "https://placehold.co/100x150/000000/FFFFFF?text=Inception",
-                    duration: "2h 28m",
-                    genre: "Sci-Fi, Action",
-                    language: "English",
-                    rating: 8.8,
-                    releaseDate: "2010-07-16"
-                },
-                {
-                    id: 2,
-                    movieName: "The Matrix",
-                    movieImage: "https://placehold.co/100x150/000000/FFFFFF?text=The+Matrix",
-                    duration: "2h 16m",
-                    genre: "Sci-Fi, Action",
-                    language: "English",
-                    rating: 8.7,
-                    releaseDate: "1999-03-31"
-                },
-                {
-                    id: 3,
-                    movieName: "Interstellar",
-                    movieImage: "https://placehold.co/100x150/000000/FFFFFF?text=Interstellar",
-                    duration: "2h 49m",
-                    genre: "Sci-Fi, Adventure",
-                    language: "English",
-                    rating: 8.6,
-                    releaseDate: "2014-11-07"
-                },
-                {
-                    id: 4,
-                    movieName: "Dune: Part Two",
-                    movieImage: "https://placehold.co/100x150/000000/FFFFFF?text=Dune+2",
-                    duration: "2h 46m",
-                    genre: "Sci-Fi, Adventure",
-                    language: "English",
-                    rating: 8.7,
-                    releaseDate: "2024-03-01"
-                },
-                {
-                    id: 5,
-                    movieName: "Oppenheimer",
-                    movieImage: "https://placehold.co/100x150/000000/FFFFFF?text=Oppenheimer",
-                    duration: "3h 0m",
-                    genre: "Biography, Drama, History",
-                    language: "English",
-                    rating: 8.6,
-                    releaseDate: "2023-07-21"
-                }
-            ];
+        let movies = [];
 
+        async function loadMovies() {
+            try {
+                const response = await axios.get('http://localhost:8080/movies/findAllMovies', {
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                movies = response.data;
+                renderMovies();
+            } catch (error) {
+                console.error('Error fetching movies:', error);
+            }
+        }
+
+        function renderMovies() {
             const movieTableBody = document.getElementById("movieTableBody");
-            const jsonModal = document.getElementById("jsonModal");
-            const jsonOutput = document.getElementById("jsonOutput");
-            const closeModalBtn = document.getElementById("closeModalBtn");
+            movieTableBody.innerHTML = ''; // Clear existing content
 
-            // Populate the table with movie data
             movies.forEach(movie => {
                 const row = document.createElement("tr");
                 row.classList.add("hover:bg-gray-50", "transition-colors", "duration-200", "rounded-xl");
@@ -245,28 +205,33 @@
                 `;
                 movieTableBody.appendChild(row);
             });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const jsonModal = document.getElementById("jsonModal");
+            const jsonOutput = document.getElementById("jsonOutput");
+            const closeModalBtn = document.getElementById("closeModalBtn");
+
+            // Load movies when page loads
+            loadMovies();
 
             // Event delegation for the "Shows" buttons
-            movieTableBody.addEventListener("click", (event) => {
+            document.getElementById("movieTableBody").addEventListener("click", (event) => {
                 const button = event.target.closest(".shows-btn");
                 if (button) {
                     const movieData = JSON.parse(button.dataset.movie);
-
-                    // Create a new object with the image excluded
                     const movieDataForDisplay = { ...movieData };
                     delete movieDataForDisplay.movieImage;
-
                     jsonOutput.textContent = JSON.stringify(movieDataForDisplay, null, 2);
                     jsonModal.style.display = "flex";
                 }
             });
 
-            // Close the modal
+            // Close modal handlers
             closeModalBtn.addEventListener("click", () => {
                 jsonModal.style.display = "none";
             });
 
-            // Close modal when clicking outside the content
             window.addEventListener("click", (event) => {
                 if (event.target === jsonModal) {
                     jsonModal.style.display = "none";

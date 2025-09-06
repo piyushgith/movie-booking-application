@@ -1,19 +1,15 @@
 package com.micro.piyush.movie.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
+import java.io.Serializable;
+import java.util.Objects;
 
-@Embeddable
-public class TicketSeatId implements java.io.Serializable {
+public class TicketSeatId implements Serializable {
 
-    @Column(name = "ticket_id")
     private Integer ticketId;
-
-    @Column(name = "show_seat_id")
     private Integer showSeatId;
 
-    // Default constructor
-    public TicketSeatId() {}
+    public TicketSeatId() {
+    }
 
     public TicketSeatId(Integer ticketId, Integer showSeatId) {
         this.ticketId = ticketId;
@@ -37,17 +33,17 @@ public class TicketSeatId implements java.io.Serializable {
         this.showSeatId = showSeatId;
     }
 
-    // Equals and HashCode
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TicketSeatId that = (TicketSeatId) o;
-        return ticketId.equals(that.ticketId) && showSeatId.equals(that.showSeatId);
+        return Objects.equals(ticketId, that.ticketId) &&
+                Objects.equals(showSeatId, that.showSeatId);
     }
 
     @Override
     public int hashCode() {
-        return 31 * ticketId.hashCode() + showSeatId.hashCode();
+        return Objects.hash(ticketId, showSeatId);
     }
 }
