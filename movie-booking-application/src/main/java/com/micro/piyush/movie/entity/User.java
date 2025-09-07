@@ -5,6 +5,7 @@ import com.micro.piyush.movie.enums.GenderType;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -45,11 +46,12 @@ public class User {
     private String password;
 
     // Relationships
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    @JsonManagedReference // This side is serialized
-    private Set<UserRole> userRoles;
+    // A User can have many UserRoles
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference // This side is serialized in a bidirectional relationship
+    private Set<UserRole> userRoles = new HashSet<>();
 
-    // Relationships
+    // This relationship seems separate from the roles, but I'll keep it for context.
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Ticket> tickets;
 

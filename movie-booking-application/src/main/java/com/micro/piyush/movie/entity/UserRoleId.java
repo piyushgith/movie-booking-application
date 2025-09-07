@@ -1,8 +1,11 @@
 package com.micro.piyush.movie.entity;
 
+import jakarta.persistence.Embeddable;
+
 import java.io.Serializable;
 import java.util.Objects;
 
+@Embeddable
 public class UserRoleId implements Serializable {
 
     private Integer userId;

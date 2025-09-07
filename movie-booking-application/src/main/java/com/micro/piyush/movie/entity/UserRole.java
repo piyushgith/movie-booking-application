@@ -1,5 +1,6 @@
 package com.micro.piyush.movie.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -11,22 +12,20 @@ import lombok.*;
 @Getter
 @Entity
 @Table(name = "user_role")
-@IdClass(UserRoleId.class)
 public class UserRole {
 
-    @Id
-    @Column(name = "user_id")
-    private Integer userId;
+    @EmbeddedId
+    private UserRoleId id;
 
-    @Id
-    @Column(name = "role", length = 50)
-    @Size(max = 50, message = "Role cannot exceed 50 characters")
-    private String role;
-
-    // Relationship
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @MapsId("userId") // Maps the 'userId' field of the composite key
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    @JsonIgnore // Prevent serializing the User field
     private User user;
+
+    @Column(name = "user_role", length = 50)
+    @Size(max = 50, message = "Role cannot exceed 50 characters")
+    private String userRole;
 
 }
 

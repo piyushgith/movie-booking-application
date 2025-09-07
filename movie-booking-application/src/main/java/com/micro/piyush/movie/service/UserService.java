@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -49,39 +46,35 @@ public class UserService {
      */
     @Transactional
     public User addUser(UserRequest userRequest) {
+        // 1. Check if the user already exists.
         Optional<User> users = findUser(userRequest.getEmailId());
         if (users.isPresent()) {
             throw new UserExist();
         }
-        // 1. Save the User entity first.
-        // This is crucial because the user's ID needs to be generated before
-        // it can be used in the UserRole composite key.
-        User savedUser = UserMapper.userDtoToUser(userRequest, passwordEncoder.encode(userRequest.getPassword()));
-        userRepository.save(savedUser);
 
-        // 2. Clear existing roles and prepare the new set for the user.
-        // This handles both new users and updating existing users' roles.
-        savedUser.setUserRoles(new HashSet<>());
+        // 2. Create the User entity from the request DTO.
+        User newUser = UserMapper.userDtoToUser(userRequest, passwordEncoder.encode(userRequest.getPassword()));
 
-        // 3. Create and save each UserRole entity for the new user.
-        // Now we are assigning only 1 role per user so no need of loop
-        // Create the composite key for the UserRole entity.
-        UserRoleId userRoleId = new UserRoleId();
-        userRoleId.setUserId(savedUser.getId());
-        userRoleId.setRole(userRequest.getRole());
-
-        // Create the UserRole entity itself.
+        // 3. Create the single UserRole entity based on the business logic.
         UserRole userRole = new UserRole();
-        userRole.setRole(userRequest.getRole());
-        userRole.setUser(savedUser);
+        userRole.setUserRole(userRequest.getRole());
+        userRole.setUser(newUser);
+        userRole.setId(new UserRoleId(null,userRequest.getRole()));
 
-        // Add the new role to the user's set of roles.
-        savedUser.getUserRoles().add(userRole);
+        Set<UserRole> userRolesSet = new HashSet<>();
+        userRolesSet.add(userRole);
 
-        // No need to explicitly save the UserRole entity.
-        // @Transactional will save it
+        // 4. Establish the bidirectional relationship using the helper method.
+        // This is the most crucial step. It links the User and UserRole objects
+        // in memory before they are saved to the database.
+        newUser.setUserRoles(userRolesSet);
 
-        return savedUser;
+        // 5. Save the User entity.
+        // Due to the `cascade = CascadeType.ALL` on the `userRoles` relationship,
+        // JPA will automatically save the `newUser` and its associated `userRole`
+        // in a single transaction. The user's ID will be generated and then
+        // automatically populated in the `user_id` column of the `user_role` table.
+        return userRepository.save(newUser);
     }
 
     public List<UserResponse> getAllUsers() {

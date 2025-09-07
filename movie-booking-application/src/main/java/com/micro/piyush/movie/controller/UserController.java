@@ -41,7 +41,6 @@ public class UserController {
             User result = userService.addUser(userEntryDto);
             return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (Exception e) {
-            // Return a ResponseEntity with the error message and a BAD_REQUEST status
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
@@ -55,7 +54,7 @@ public class UserController {
             Optional<User> user = userService.findUser(authRequest.getEmailId());
             if (user.isPresent())
                 role = user.get().getUserRoles().stream()
-                        .map(userRole -> userRole.getRole())
+                        .map(userRole -> userRole.getUserRole())
                         .toArray(String[]::new);
             if (role.length > 0) {
                 return new JWTTokenResponse(jwtService.generateToken(authRequest.getEmailId()), role[0]);
