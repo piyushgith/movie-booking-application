@@ -1,34 +1,31 @@
 -- Insert 10 Movies
-INSERT INTO MOVIE (ID, DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_DATE,MOVIE_IMAGE) VALUES
-(1, 120, 'ACTION', 'ENGLISH', 'Deadpool & Wolverine', 8.0, '2024-07-26','https://placehold.co/150x100/702963/FFFFFF?text=Deadpool+Wolverine'),
-(2, 150, 'DRAMA', 'HINDI', 'Mahavatar Narsimha', 9.8, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Mahavatar+Narsimha'),
-(3, 135, 'DRAMA', 'ENGLISH', 'Alien: Romulus', 7.5, '2024-08-16','https://placehold.co/150x100/702963/FFFFFF?text=Alien+Romulus'),
-(4, 140, 'COMEDY', 'HINDI', 'Don 2', 6.5, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Don+2'),
-(5, 130, 'THRILLER', 'ENGLISH', 'Blink Twice', 6.8, '2024-08-23','https://placehold.co/150x100/702963/FFFFFF?text=Blink+Twice'),
-(6, 145, 'ACTION', 'HINDI', 'Yodha', 6.2, '2024-03-15','https://placehold.co/150x100/702963/FFFFFF?text=Yodha'),
-(7, 125, 'ANIMATION', 'ENGLISH', 'Mufasa: The Lion King', 7.0, '2024-12-20','https://placehold.co/150x100/702963/FFFFFF?text=Mufasa'),
-(8, 160, 'DRAMA', 'HINDI', 'Shershaah 2', 7.2, '2025-01-15','https://placehold.co/150x100/702963/FFFFFF?text=Shershaah+2'),
-(9, 110, 'COMEDY', 'ENGLISH', 'Beetlejuice Beetlejuice', 7.4, '2024-09-06','https://placehold.co/150x100/702963/FFFFFF?text=Beetlejuice'),
-(10, 155, 'DRAMA', 'ENGLISH', 'Dune: Part Three', 8.5, '2025-02-14','https://placehold.co/150x100/702963/FFFFFF?text=Dune+3');
-
--- MOVIES TABLE (10 Movies)
---INSERT INTO movie (duration, genre, language, movie_name, rating, release_date) VALUES
---(148, 'ACTION', 'ENGLISH', 'Spider-Man: No Way Home', 8.4, '2021-12-17'),
---(181, 'SCIENCE_FICTION', 'ENGLISH', 'Avengers: Endgame', 8.4, '2019-04-26'),
---(155, 'ACTION', 'ENGLISH', 'Top Gun: Maverick', 8.3, '2022-05-27'),
---(142, 'DRAMA', 'ENGLISH', 'The Batman', 7.8, '2022-03-04'),
---(130, 'COMEDY', 'HINDI', 'Pathaan', 6.0, '2023-01-25'),
---(169, 'ACTION', 'HINDI', 'RRR', 8.0, '2022-03-25'),
---(175, 'DRAMA', 'HINDI', 'Dangal', 8.4, '2016-12-23'),
---(164, 'ACTION', 'TAMIL', 'Vikram', 8.4, '2022-06-03'),
---(169, 'ACTION', 'TELUGU', 'Pushpa: The Rise', 7.6, '2021-12-17'),
---(148, 'THRILLER', 'ENGLISH', 'John Wick: Chapter 4', 7.7, '2023-03-24');
+INSERT INTO MOVIE (DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_DATE,MOVIE_IMAGE) VALUES
+--(120, 'ACTION', 'ENGLISH', 'Deadpool & Wolverine', 8.0, '2024-07-26','https://placehold.co/150x100/702963/FFFFFF?text=Deadpool+Wolverine'),
+--(150, 'THRILLER', 'HINDI', 'Andhadhun', 9.8, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Andhadhun'),
+--(135, 'DRAMA', 'ENGLISH', 'Alien: Romulus', 7.5, '2024-08-16','https://placehold.co/150x100/702963/FFFFFF?text=Alien+Romulus'),
+--(140, 'COMEDY', 'HINDI', 'Don 2', 6.5, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Don+2'),
+--(130, 'THRILLER', 'ENGLISH', 'Blink Twice', 6.8, '2024-08-23','https://placehold.co/150x100/702963/FFFFFF?text=Blink+Twice'),
+--(145, 'ACTION', 'HINDI', 'Yodha', 6.2, '2024-03-15','https://placehold.co/150x100/702963/FFFFFF?text=Yodha'),
+--(125, 'ANIMATION', 'ENGLISH', 'Mufasa: The Lion King', 7.0, '2024-12-20','https://placehold.co/150x100/702963/FFFFFF?text=Mufasa'),
+--(160, 'DRAMA', 'HINDI', 'Shershaah 2', 7.2, '2025-01-15','https://placehold.co/150x100/702963/FFFFFF?text=Shershaah+2'),
+--(110, 'COMEDY', 'ENGLISH', 'Beetlejuice Beetlejuice', 7.4, '2024-09-06','https://placehold.co/150x100/702963/FFFFFF?text=Beetlejuice'),
+--(155, 'DRAMA', 'ENGLISH', 'Dune: Part Three', 8.5, '2025-02-14','https://placehold.co/150x100/702963/FFFFFF?text=Dune+3'),
+(148, 'ACTION', 'ENGLISH', 'Spider-Man: No Way Home', 8.4, '2021-12-17','https://placehold.co/150x100/702963/FFFFFF?text=Spider-Man'),
+(181, 'SCIENCE_FICTION', 'ENGLISH', 'Avengers: Endgame', 8.4, '2019-04-26','https://placehold.co/150x100/702963/FFFFFF?text=Avengers+Endgame'),
+(155, 'ACTION', 'ENGLISH', 'Top Gun: Maverick', 8.3, '2022-05-27','https://placehold.co/150x100/702963/FFFFFF?text=Top+Gun+Maverick'),
+(142, 'DRAMA', 'ENGLISH', 'The Batman', 7.8, '2022-03-04','https://placehold.co/150x100/702963/FFFFFF?text=The+Batman'),
+(130, 'COMEDY', 'HINDI', 'Mahavatar Narsimha', 6.0, '2025-08-25','https://placehold.co/150x100/702963/FFFFFF?text=Mahavatar+Narsimha'),
+(169, 'ACTION', 'HINDI', 'RRR', 8.0, '2022-03-25','https://placehold.co/150x100/702963/FFFFFF?text=RRR'),
+(175, 'DRAMA', 'HINDI', 'Dangal', 8.4, '2016-12-23','https://placehold.co/150x100/702963/FFFFFF?text=Dangal'),
+(164, 'ACTION', 'TAMIL', 'Vikram', 8.4, '2022-06-03','https://placehold.co/150x100/702963/FFFFFF?text=Vikram'),
+(169, 'ACTION', 'TELUGU', 'Pushpa: The Rise', 7.6, '2021-12-17','https://placehold.co/150x100/702963/FFFFFF?text=Pushpa+The+Rise'),
+(148, 'THRILLER', 'ENGLISH', 'John Wick: Chapter 4', 7.7, '2023-03-24','https://placehold.co/150x100/702963/FFFFFF?text=John+Wick+4');
 
 
 -- THEATERS TABLE (8 Theaters - 2 per location)
 INSERT INTO theater (address, location, name) VALUES
 -- BANGALORE
-('MG Road, Brigade Gateway', 'BANGALORE', 'PVR Forum Mall Koramangala'),
+('MG Road, Brigade Gateway', 'BANGALORE', 'PVR Forum Mall'),
 ('Whitefield Main Road', 'BANGALORE', 'INOX Garuda Mall'),
 
 -- CHENNAI
@@ -36,7 +33,7 @@ INSERT INTO theater (address, location, name) VALUES
 ('Phoenix MarketCity, Velachery', 'CHENNAI', 'AGS Cinemas OMR'),
 
 -- DELHI
-('Select City Walk, Saket', 'DELHI', 'PVR Select City Walk'),
+('Select City Walk, Saket', 'DELHI', 'PVR Select City'),
 ('Ambience Mall, Gurgaon', 'DELHI', 'INOX Insignia'),
 
 -- MUMBAI

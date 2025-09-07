@@ -1,5 +1,6 @@
 package com.micro.piyush.movie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.micro.piyush.movie.enums.GenreType;
 import com.micro.piyush.movie.enums.LanguageType;
 import jakarta.persistence.*;
@@ -53,6 +54,7 @@ public class Movie {
 
     // Relationships
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference // This side is serialized in a bidirectional relationship
     private List<Show> shows;
 
 }

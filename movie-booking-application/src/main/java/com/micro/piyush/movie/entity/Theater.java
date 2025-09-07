@@ -1,5 +1,6 @@
 package com.micro.piyush.movie.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.micro.piyush.movie.enums.LocationType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -34,6 +35,7 @@ public class Theater {
 
     // Relationships
     @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference // This side is serialized in a bidirectional relationship
     private List<Show> shows;
 
     @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

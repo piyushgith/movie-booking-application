@@ -1,14 +1,24 @@
 package com.micro.piyush.movie.enums;
 
 public enum GenreType {
-    DRAMA,
-    THRILLER,
     ACTION,
-    ROMANTIC,
+    ADVENTURE,
     COMEDY,
-    HISTORICAL,
+    DRAMA,
+    FANTASY,
+    HORROR,
+    MYSTERY,
+    ROMANCE,
+    THRILLER,
+    WESTERN,
+    SCIENCE_FICTION,
+    DOCUMENTARY,
     ANIMATION,
-    SPORTS,
-    SOCIAL,
+    BIOGRAPHY,
+    CRIME,
+    FAMILY,
+    HISTORY,
+    MUSIC,
+    SPORT,
     WAR
 }

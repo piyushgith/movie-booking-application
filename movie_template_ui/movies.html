@@ -7,6 +7,11 @@
     <title>Movie Listings</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Include jQuery (Tablesorter depends on it) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/jquery.tablesorter/2.32.0/js/jquery.tablesorter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- Inter Font -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -112,7 +117,7 @@
         <!-- Movie Table Section -->
         <div class="bg-white rounded-2xl shadow-xl p-6 md:p-8 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="styled-table w-full">
+                <table id="myTable" class="styled-table w-full">
                     <thead>
                         <tr>
                             <th class="rounded-tl-lg">ID</th>
@@ -149,70 +154,72 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+
     <script>
-        const token = sessionStorage.getItem("token");
-        const role = sessionStorage.getItem("role");
+        $(document).ready(function () {
 
-        if (!token) {
-            window.location.href = "login_animation.html"; // redirect if not logged in
-        }
+            const token = sessionStorage.getItem("token");
+            const role = sessionStorage.getItem("role");
 
-        // Logout function
-        logoutBtn.addEventListener("click", () => {
-            sessionStorage.clear(); // Clear all session data
-            localStorage.clear(); // Clear all local storage data
-            window.location.href = "login_animation.html";
-        });
-
-        // Replace the movies constant declaration and DOMContentLoaded event listener with:
-
-        let movies = [];
-
-        async function loadMovies() {
-            try {
-                const response = await axios.get('http://localhost:8080/movies/findAllMovies', {
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                movies = response.data;
-                renderMovies();
-            } catch (error) {
-                console.error('Error fetching movies:', error);
+            if (!token) {
+                window.location.href = "login_animation.html"; // redirect if not logged in
             }
-        }
 
-        function renderMovies() {
-            const movieTableBody = document.getElementById("movieTableBody");
-            movieTableBody.innerHTML = ''; // Clear existing content
-
-            movies.forEach(movie => {
-                const row = document.createElement("tr");
-                row.classList.add("hover:bg-gray-50", "transition-colors", "duration-200", "rounded-xl");
-                row.innerHTML = `
-                    <td class="p-3 md:p-4">${movie.id}</td>
-                    <td class="p-3 md:p-4 font-semibold text-gray-800">${movie.movieName}</td>
-                    <td class="p-3 md:p-4"><img src="${movie.movieImage}" alt="${movie.movieName} Poster" class="w-16 h-auto rounded-lg shadow"></td>
-                    <td class="p-3 md:p-4">${movie.duration}</td>
-                    <td class="p-3 md:p-4">${movie.genre}</td>
-                    <td class="p-3 md:p-4">${movie.language}</td>
-                    <td class="p-3 md:p-4"><span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">${movie.rating}</span></td>
-                    <td class="p-3 md:p-4">${movie.releaseDate}</td>
-                    <td class="p-3 md:p-4">
-                        <button class="shows-btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full transition-colors duration-200 shadow-md transform hover:scale-105" data-movie='${JSON.stringify(movie)}'>
-                            Shows
-                        </button>
-                    </td>
-                `;
-                movieTableBody.appendChild(row);
+            // Logout function
+            $('#logoutBtn').on("click", () => {
+                sessionStorage.clear(); // Clear all session data
+                localStorage.clear(); // Clear all local storage data
+                window.location.href = "login_animation.html";
             });
-        }
 
-        document.addEventListener("DOMContentLoaded", () => {
+            let movies = [];
+
+            async function loadMovies() {
+                try {
+                    const response = await axios.get('http://localhost:8080/movies/findAllMovies', {
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+                    movies = response.data;
+                    renderMovies();
+                    // IMPORTANT: Initialize tablesorter AFTER the table is populated
+                    $("#myTable").tablesorter();
+                } catch (error) {
+                    console.error('Error fetching movies:', error);
+                }
+            }
+
+            function renderMovies() {
+                const movieTableBody = document.getElementById("movieTableBody");
+                movieTableBody.innerHTML = ''; // Clear existing content
+
+                movies.forEach(movie => {
+                    const row = document.createElement("tr");
+                    row.classList.add("hover:bg-gray-50", "transition-colors", "duration-200", "rounded-xl");
+                    row.innerHTML = `
+                <td class="p-3 md:p-4">${movie.id}</td>
+                <td class="p-3 md:p-4 font-semibold text-gray-800">${movie.movieName}</td>
+                <td class="p-3 md:p-4"><img src="${movie.movieImage}" alt="${movie.movieName} Poster" class="w-16 h-auto rounded-lg shadow"></td>
+                <td class="p-3 md:p-4">${movie.duration}</td>
+                <td class="p-3 md:p-4">${movie.genre}</td>
+                <td class="p-3 md:p-4">${movie.language}</td>
+                <td class="p-3 md:p-4"><span class="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-1 rounded-full">${movie.rating}</span></td>
+                <td class="p-3 md:p-4">${movie.releaseDate}</td>
+                <td class="p-3 md:p-4">
+                    <button class="shows-btn bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-full transition-colors duration-200 shadow-md transform hover:scale-105" data-movie='${JSON.stringify(movie)}'>
+                        Shows
+                    </button>
+                </td>
+            `;
+                    movieTableBody.appendChild(row);
+                });
+            }
+
             const jsonModal = document.getElementById("jsonModal");
             const jsonOutput = document.getElementById("jsonOutput");
             const closeModalBtn = document.getElementById("closeModalBtn");
 
-            // Load movies when page loads
+            // Load movies when the page loads
             loadMovies();
 
             // Event delegation for the "Shows" buttons
@@ -232,7 +239,7 @@
                 jsonModal.style.display = "none";
             });
 
-            window.addEventListener("click", (event) => {
+            $(window).on("click", (event) => {
                 if (event.target === jsonModal) {
                     jsonModal.style.display = "none";
                 }
