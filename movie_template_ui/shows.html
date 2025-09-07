@@ -45,23 +45,23 @@
 
     <main class="flex-grow container mx-auto px-4 py-8">
         <section class="text-center my-12 bg-white rounded-2xl shadow-xl p-8 max-w-4xl mx-auto">
-            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Find Shows by Location</h2>
+            <h2 class="text-4xl font-extrabold text-gray-800 mb-4">Find Shows</h2>
             <p class="text-lg text-gray-600 leading-relaxed">
                 Select your city to see available movies and showtimes.
             </p>
         </section>
 
         <!-- Location selection and search -->
-        <div class="mb-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
+        <div id="locationSearch"
+            class="mb-6 flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 justify-center">
             <label for="location" class="text-lg font-medium text-gray-700">Select Location:</label>
             <select id="location"
                 class="px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                <option value="Bangalore">Bangalore</option>
-                <option value="Chennai">Chennai</option>
-                <option value="Delhi">Delhi</option>
-                <option value="Mumbai">Mumbai</option>
+                <option value="BANGALORE">Bangalore</option>
+                <option value="MUMBAI">Mumbai</option>
+                <option value="DELHI">Delhi</option>
             </select>
-            <button id="loadMovies"
+            <button id="loadShowsBtn"
                 class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-full transition duration-300">
                 Search
             </button>
@@ -86,10 +86,6 @@
         }
 
         const logoutBtn = document.getElementById("logoutBtn");
-        const locationSelect = document.getElementById("location");
-        const moviesList = document.getElementById("moviesList");
-        const errorMsg = document.getElementById("errorMsg");
-        const loadMoviesBtn = document.getElementById("loadMovies");
 
         // Logout function
         logoutBtn.addEventListener("click", () => {
@@ -98,69 +94,96 @@
             window.location.href = "login_animation.html";
         });
 
-        // Load movies by location
-        async function loadMovies() {
-            const location = locationSelect.value;
+        const locationSelect = document.getElementById("location");
+        const moviesList = document.getElementById("moviesList");
+        const errorMsg = document.getElementById("errorMsg");
+        const loadShowsBtn = document.getElementById("loadShowsBtn");
+        const locationSearchContainer = document.getElementById("locationSearch");
+
+        /**
+         * Displays a list of movie shows.
+         * @param {Array<Object>} shows - An array of show objects to display.
+         */
+        function displayShows(shows) {
             moviesList.innerHTML = "";
             errorMsg.classList.add('hidden');
 
-            try {
-                const response = await fetch(`http://localhost:8080/api/movies?location=${location}`, {
-                    headers: {
-                        "Authorization": "Bearer " + token
-                    }
-                });
+            if (!shows || shows.length === 0) {
+                errorMsg.classList.remove('hidden');
+                return;
+            }
 
-                if (!response.ok) {
-                    throw new Error("Failed to fetch movies");
-                }
+            shows.forEach(movie => {
+                const card = document.createElement("div");
+                card.classList.add("movie-card", "bg-white", "rounded-2xl", "shadow-lg", "overflow-hidden", "flex", "flex-col", "transition", "duration-300", "hover:shadow-2xl", "hover:scale-105", "transform");
 
-                const movies = await response.json();
-
-                if (movies.length === 0) {
-                    errorMsg.classList.remove('hidden');
-                    return;
-                }
-
-                movies.forEach(movie => {
-                    const card = document.createElement("div");
-                    card.classList.add("movie-card", "bg-white", "rounded-2xl", "shadow-lg", "overflow-hidden", "flex", "flex-col", "transition", "duration-300", "hover:shadow-2xl", "hover:scale-105", "transform");
-
-                    card.innerHTML = `
-                        <img src="${movie.posterUrl}" alt="${movie.title}" class="w-full h-96 object-cover">
-                        <div class="p-5 flex-grow">
-                            <h3 class="font-bold text-xl text-gray-800 mb-2">${movie.title}</h3>
-                            <p class="text-gray-600 text-sm mb-2"><strong>Theatre:</strong> ${movie.theatre}</p>
-                            <div class="showtimes flex flex-wrap gap-2">
-                                ${movie.timings.map(time =>
-                        `<button class="showtime-btn px-3 py-1 bg-indigo-600 text-white text-xs font-medium rounded-full hover:bg-indigo-700 transition duration-300" data-id="${movie.id}" data-time="${time}">
-                                        ${time}
-                                    </button>`).join("")}
-                            </div>
+                card.innerHTML = `
+                    <img src="${movie.posterUrl}" alt="${movie.title}" class="w-full h-96 object-cover">
+                    <div class="p-5 flex-grow">
+                        <h3 class="font-bold text-xl text-gray-800 mb-2">${movie.title}</h3>
+                        <p class="text-gray-600 text-sm mb-2"><strong>Theatre:</strong> ${movie.theatre}</p>
+                        <div class="showtimes flex flex-wrap gap-2">
+                            ${movie.timings.map(time =>
+                    `<button class="showtime-btn px-3 py-1 bg-indigo-600 text-white text-xs font-medium rounded-full hover:bg-indigo-700 transition duration-300" data-id="${movie.id}" data-time="${time}">
+                                ${time}
+                            </button>`).join("")}
                         </div>
-                    `;
+                    </div>
+                `;
+                moviesList.appendChild(card);
+            });
 
-                    moviesList.appendChild(card);
+            // Add event listeners to showtime buttons
+            document.querySelectorAll(".showtime-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const movieId = btn.getAttribute("data-id");
+                    const time = btn.getAttribute("data-time");
+                    window.location.href = `seats.html?movieId=${movieId}&time=${encodeURIComponent(time)}`;
                 });
+            });
+        }
 
-                // Add event listeners to showtime buttons
-                document.querySelectorAll(".showtime-btn").forEach(btn => {
-                    btn.addEventListener("click", () => {
-                        const movieId = btn.getAttribute("data-id");
-                        const time = btn.getAttribute("data-time");
-                        window.location.href = `seats.html?movieId=${movieId}&time=${encodeURIComponent(time)}`;
-                    });
-                });
+        /**
+         * Fetches show data from a given API endpoint and displays it.
+         * @param {string} url - The API endpoint to fetch data from.
+         * @param {string} location - The location to filter shows by.
+         */
+        async function fetchAndDisplayShows(url, location) {
+            moviesList.innerHTML = `<div class="col-span-full text-center text-lg text-gray-500">Loading shows...</div>`;
+            errorMsg.classList.add('hidden');
 
+            try {
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                const shows = data.locations ? data.locations[location.toUpperCase()] : [data];
+                displayShows(shows);
             } catch (error) {
-                errorMsg.textContent = "Error loading movies.";
+                errorMsg.textContent = "Error loading shows. Please try again later.";
                 errorMsg.classList.remove('hidden');
             }
         }
 
-        // Initial load
-        loadMoviesBtn.addEventListener("click", loadMovies);
-        loadMovies(); // load default (Mumbai)
+        // Logic to determine which API to call
+        const urlParams = new URLSearchParams(window.location.search);
+        const movieId = urlParams.get('movieId');
+
+        if (movieId) {
+            // Case 2: Opened from movie page with a movieId
+            locationSearchContainer.classList.add('hidden'); // Hide location dropdown and search button
+            fetchAndDisplayShows(`http://localhost:8080/show/findShow/${movieId}`, locationSelect.value);
+        } else {
+            // Case 1: Opened from the navigation bar
+            loadShowsBtn.addEventListener("click", () => {
+                const location = locationSelect.value.toUpperCase();
+                fetchAndDisplayShows(`http://localhost:8080/show/findShowByLocation/${location}`, location);
+            });
+            // Initial load for the default location
+            const defaultLocation = locationSelect.value.toUpperCase();
+            fetchAndDisplayShows(`http://localhost:8080/show/findShowByLocation/${defaultLocation}`, defaultLocation);
+        }
     </script>
 </body>
 

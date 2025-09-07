@@ -174,11 +174,11 @@
             });
 
             let movies = [];
-
+//,'Authorization': "Bearer " + token
             async function loadMovies() {
                 try {
                     const response = await axios.get('http://localhost:8080/movies/findAllMovies', {
-                        headers: { 'Content-Type': 'application/json' }
+                        headers: { 'Content-Type': 'application/json'}
                     });
                     movies = response.data;
                     renderMovies();

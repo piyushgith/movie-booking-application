@@ -1,5 +1,6 @@
 package com.micro.piyush.movie.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.micro.piyush.movie.enums.SeatType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -46,11 +47,13 @@ public class ShowSeat {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theater_id", nullable = false)
     @NotNull(message = "Theater is required")
+    @JsonBackReference
     private Theater theater;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "show_id", nullable = false)
     @NotNull(message = "Show is required")
+    @JsonBackReference
     private Show show;
 
     // Relationships
