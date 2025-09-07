@@ -1,5 +1,5 @@
 -- Insert 10 Movies
-INSERT INTO MOVIES (ID, DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_DATE,MOVIE_IMAGE) VALUES
+INSERT INTO MOVIE (ID, DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_DATE,MOVIE_IMAGE) VALUES
 (1, 120, 'ACTION', 'ENGLISH', 'Deadpool & Wolverine', 8.0, '2024-07-26','https://placehold.co/150x100/702963/FFFFFF?text=Deadpool+Wolverine'),
 (2, 150, 'DRAMA', 'HINDI', 'Mahavatar Narsimha', 9.8, '2024-08-15','https://placehold.co/150x100/702963/FFFFFF?text=Mahavatar+Narsimha'),
 (3, 135, 'DRAMA', 'ENGLISH', 'Alien: Romulus', 7.5, '2024-08-16','https://placehold.co/150x100/702963/FFFFFF?text=Alien+Romulus'),
@@ -11,159 +11,138 @@ INSERT INTO MOVIES (ID, DURATION, GENRE, LANGUAGE, MOVIE_NAME, RATING, RELEASE_D
 (9, 110, 'COMEDY', 'ENGLISH', 'Beetlejuice Beetlejuice', 7.4, '2024-09-06','https://placehold.co/150x100/702963/FFFFFF?text=Beetlejuice'),
 (10, 155, 'DRAMA', 'ENGLISH', 'Dune: Part Three', 8.5, '2025-02-14','https://placehold.co/150x100/702963/FFFFFF?text=Dune+3');
 
--- Insert 8 Theaters (2 per location: Bangalore, Chennai, Delhi, Mumbai)
-INSERT INTO THEATERS (ID, ADDRESS,LOCATION, NAME) VALUES
-(1, 'MG Road', 'Bangalore', 'PVR Orion Mall'),
-(2, 'Koramangala', 'Bangalore', 'INOX Forum Mall'),
-(3, 'T Nagar', 'Chennai', 'Sathyam Cinemas'),
-(4, 'Anna Nagar', 'Chennai', 'SPI Palazzo'),
-(5, 'Connaught Place', 'Delhi', 'PVR Plaza'),
-(6, 'Saket', 'Delhi', 'INOX DLF Mall'),
-(7, 'Bandra', 'Mumbai', 'PVR Juhu'),
-(8, 'Andheri', 'Mumbai', 'Cinepolis Andheri');
-
--- Insert Theater Seats (80 seats per theater: 8 rows A-H, 10 columns 1-10)
--- Using a loop or cross join to generate seat numbers
-INSERT INTO THEATER_SEATS (id, seat_no, seat_type, theater_id)
-SELECT
-    ROW_NUMBER() OVER () AS id,
-    CONCAT(row_name, col_num) AS seat_no,
-    'CLASSIC' AS seat_type,
-    theater_id
-FROM (
-    SELECT
-        t.id AS theater_id,
-        row_name,
-        col_num
-    FROM
-        (SELECT id FROM THEATERS) t
-        CROSS JOIN
-        (SELECT 'A' AS row_name UNION SELECT 'B' UNION SELECT 'C' UNION SELECT 'D'
-         UNION SELECT 'E' UNION SELECT 'F' UNION SELECT 'G' UNION SELECT 'H') rows
-        CROSS JOIN
-        (SELECT 1 AS col_num UNION SELECT 2 UNION SELECT 3 UNION SELECT 4 UNION SELECT 5
-         UNION SELECT 6 UNION SELECT 7 UNION SELECT 8 UNION SELECT 9 UNION SELECT 10) cols
-) seat_combinations
-ORDER BY theater_id, row_name, col_num;
-
--- Insert Shows (2 shows per movie per theater)
--- 10 movies * 8 theaters * 2 shows = 160 shows
-INSERT INTO SHOWS (show_id, date, time, movie_id, theater_id)
-SELECT
-    ROW_NUMBER() OVER () AS show_id,
-    '2025-09-10' AS date,
-    CASE
-        WHEN ROW_NUMBER() OVER (PARTITION BY m.id, t.id) = 1 THEN '15:00:00'
-        ELSE '18:00:00'
-    END AS time,
-    m.id AS movie_id,
-    t.id AS theater_id
-FROM MOVIES m CROSS JOIN THEATERS t
-ORDER BY m.id, t.id;
-
--- Insert Show Seats (80 seats per show)
--- 160 shows * 80 seats = 12,800 show seats
-INSERT INTO SHOW_SEATS (id, is_available, is_food_contains, price, theater_seat_id, show_id)
-SELECT
-    ROW_NUMBER() OVER () AS id,
-    TRUE AS is_available,
-    FALSE AS is_food_contains,
-    200 AS price,
-    ts.id AS theater_seat_id,
-    s.show_id
-FROM SHOWS s JOIN THEATER_SEATS ts ON s.theater_id = ts.theater_id
-ORDER BY s.show_id, ts.id;
+-- MOVIES TABLE (10 Movies)
+--INSERT INTO movie (duration, genre, language, movie_name, rating, release_date) VALUES
+--(148, 'ACTION', 'ENGLISH', 'Spider-Man: No Way Home', 8.4, '2021-12-17'),
+--(181, 'SCIENCE_FICTION', 'ENGLISH', 'Avengers: Endgame', 8.4, '2019-04-26'),
+--(155, 'ACTION', 'ENGLISH', 'Top Gun: Maverick', 8.3, '2022-05-27'),
+--(142, 'DRAMA', 'ENGLISH', 'The Batman', 7.8, '2022-03-04'),
+--(130, 'COMEDY', 'HINDI', 'Pathaan', 6.0, '2023-01-25'),
+--(169, 'ACTION', 'HINDI', 'RRR', 8.0, '2022-03-25'),
+--(175, 'DRAMA', 'HINDI', 'Dangal', 8.4, '2016-12-23'),
+--(164, 'ACTION', 'TAMIL', 'Vikram', 8.4, '2022-06-03'),
+--(169, 'ACTION', 'TELUGU', 'Pushpa: The Rise', 7.6, '2021-12-17'),
+--(148, 'THRILLER', 'ENGLISH', 'John Wick: Chapter 4', 7.7, '2023-03-24');
 
 
+-- THEATERS TABLE (8 Theaters - 2 per location)
+INSERT INTO theater (address, location, name) VALUES
+-- BANGALORE
+('MG Road, Brigade Gateway', 'BANGALORE', 'PVR Forum Mall Koramangala'),
+('Whitefield Main Road', 'BANGALORE', 'INOX Garuda Mall'),
 
---
----- Insert 10 rows into movies
---INSERT INTO movies (duration, genre, language, movie_name, rating, release_date) VALUES
---(120, 'ACTION', 'ENGLISH', 'The Dark Knight', 8.4, '2008-07-18'),
---(150, 'DRAMA', 'HINDI', 'Dangal', 8.3, '2016-12-23'),
---(135, 'COMEDY', 'TAMIL', 'Boss Engira Baskaran', 7.2, '2010-09-10'),
---(140, 'THRILLER', 'TELUGU', 'Drishyam', 8.3, '2013-07-31'),
---(125, 'ANIMATION', 'ENGLISH', 'Toy Story', 8.3, '1995-11-22'),
---(130, 'ROMANTIC', 'KANNADA', 'Mungaru Male', 8.1, '2006-12-29'),
---(145, 'HISTORICAL', 'MARATHI', 'Harishchandrachi Factory', 8.4, '2009-01-29'),
---(110, 'SOCIAL', 'PUNJAB', 'Udta Punjab', 7.7, '2016-06-17'),
---(155, 'WAR', 'ENGLISH', 'Dunkirk', 7.8, '2017-07-21'),
---(115, 'SPORTS', 'HINDI', 'Chak De! India', 8.1, '2007-08-10');
---
----- Insert 10 rows into theaters
---INSERT INTO theaters (address, name) VALUES
---('123 MG Road, Bengaluru', 'PVR Orion'),
---('456 Anna Salai, Chennai', 'Sathyam Cinemas'),
---('789 Bandra West, Mumbai', 'INOX Nariman'),
---('101 Jubilee Hills, Hyderabad', 'Prasads Multiplex'),
---('321 Connaught Place, Delhi', 'Regal Cinema'),
---('654 Koramangala, Bengaluru', 'Cinepolis'),
---('987 Velachery, Chennai', 'Phoenix Marketcity'),
---('147 Andheri East, Mumbai', 'PVR Dynamix'),
---('258 Banjara Hills, Hyderabad', 'GVK One'),
---('369 Karol Bagh, Delhi', 'Liberty Cinema');
---
----- Insert 10 rows into theater_seats
---INSERT INTO theater_seats (seat_no, seat_type, theater_id) VALUES
---('A1', 'CLASSIC', 1),
---('A2', 'CLASSIC', 1),
---('B1', 'PREMIUM', 2),
---('B2', 'PREMIUM', 2),
---('C1', 'CLASSIC', 3),
---('C2', 'CLASSIC', 3),
---('D1', 'PREMIUM', 4),
---('D2', 'PREMIUM', 4),
---('E1', 'CLASSIC', 5),
---('E2', 'CLASSIC', 5);
---
----- Insert 10 rows into shows
---INSERT INTO shows (date, time, movie_id, theater_id) VALUES
---('2025-09-01', '10:00:00', 1, 1),
---('2025-09-01', '13:00:00', 2, 2),
---('2025-09-02', '16:00:00', 3, 3),
---('2025-09-02', '19:00:00', 4, 4),
---('2025-09-03', '11:00:00', 5, 5),
---('2025-09-03', '14:00:00', 6, 6),
---('2025-09-04', '17:00:00', 7, 7),
---('2025-09-04', '20:00:00', 8, 8),
---('2025-09-05', '12:00:00', 9, 9),
---('2025-09-05', '15:00:00', 10, 10);
---
----- Insert 10 rows into show_seats
---INSERT INTO show_seats (is_available, is_food_contains, price, seat_no, seat_type, show_show_id) VALUES
---(true, false, 200, 'A1', 'CLASSIC', 1),
---(true, true, 350, 'A2', 'PREMIUM', 1),
---(false, false, 250, 'B1', 'CLASSIC', 2),
---(true, false, 300, 'B2', 'PREMIUM', 2),
---(true, true, 220, 'C1', 'CLASSIC', 3),
---(false, false, 400, 'C2', 'PREMIUM', 3),
---(true, true, 280, 'D1', 'CLASSIC', 4),
---(true, false, 360, 'D2', 'PREMIUM', 4),
---(false, true, 210, 'E1', 'CLASSIC', 5),
---(true, false, 390, 'E2', 'PREMIUM', 5);
---
----- Insert 10 rows into users
---INSERT INTO users (address, age, email_id, gender, mobile_no, name, password, roles) VALUES
---('12 Jayanagar, Bengaluru', 25, 'rahul.sharma@gmail.com', 'MALE', '9876543210', 'Rahul Sharma', 'pass123', 'USER'),
---('34 T Nagar, Chennai', 30, 'priya.singh@gmail.com', 'FEMALE', '8765432109', 'Priya Singh', 'pass456', 'USER'),
---('56 Bandra, Mumbai', 22, 'arjun.mehta@gmail.com', 'MALE', '7654321098', 'Arjun Mehta', 'pass789', 'USER'),
---('78 Banjara Hills, Hyderabad', 28, 'anita.verma@gmail.com', 'FEMALE', '6543210987', 'Anita Verma', 'pass101', 'USER'),
---('90 Karol Bagh, Delhi', 35, 'vikas.yadav@gmail.com', 'MALE', '5432109876', 'Vikas Yadav', 'pass202', 'USER'),
---('23 Koramangala, Bengaluru', 27, 'neha.kumar@gmail.com', 'FEMALE', '4321098765', 'Neha Kumar', 'pass303', 'USER'),
---('45 Velachery, Chennai', 29, 'suresh.nair@gmail.com', 'MALE', '3210987654', 'Suresh Nair', 'pass404', 'USER'),
---('67 Andheri, Mumbai', 24, 'pooja.desai@gmail.com', 'FEMALE', '2109876543', 'Pooja Desai', 'pass505', 'USER'),
---('89 Gachibowli, Hyderabad', 31, 'ravi.patel@gmail.com', 'MALE', '1098765432', 'Ravi Patel', 'pass606', 'USER'),
---('11 Connaught Place, Delhi', 26, 'meera.joshi@gmail.com', 'FEMALE', '0987654321', 'Meera Joshi', 'pass707', 'USER');
+-- CHENNAI
+('Express Avenue Mall, Royapettah', 'CHENNAI', 'PVR Express Avenue'),
+('Phoenix MarketCity, Velachery', 'CHENNAI', 'AGS Cinemas OMR'),
 
--- Insert 10 rows into tickets
---INSERT INTO tickets (booked_at, booked_seats, total_tickets_price, show_show_id, user_id) VALUES
---('2025-08-30', 'A1', 200, 1, 1),
---('2025-08-30', 'A2', 350, 1, 2),
---('2025-08-31', 'B1', 250, 2, 3),
---('2025-08-31', 'B2', 300, 2, 4),
---('2025-09-01', 'C1', 220, 3, 5),
---('2025-09-01', 'C2', 400, 3, 6),
---('2025-09-02', 'D1', 280, 4, 7),
---('2025-09-02', 'D2', 360, 4, 8),
---('2025-09-03', 'E1', 210, 5, 9),
---('2025-09-03', 'E2', 390, 5, 10);
+-- DELHI
+('Select City Walk, Saket', 'DELHI', 'PVR Select City Walk'),
+('Ambience Mall, Gurgaon', 'DELHI', 'INOX Insignia'),
+
+-- MUMBAI
+('Phoenix Mills, Lower Parel', 'MUMBAI', 'PVR Phoenix'),
+('Palladium Mall, High Street Phoenix', 'MUMBAI', 'INOX Palladium');
+
+-- SHOWS TABLE (2 shows per movie per theater = 10 movies × 8 theaters × 2 shows = 160 shows)
+INSERT INTO show (date, time, movie_id, theater_id) VALUES
+-- Movie 1 (Spider-Man: No Way Home) in all theaters
+('2024-01-15', '10:00', 1, 1), ('2024-01-15', '18:00', 1, 1),
+('2024-01-15', '11:00', 1, 2), ('2024-01-15', '19:00', 1, 2),
+('2024-01-15', '12:00', 1, 3), ('2024-01-15', '20:00', 1, 3),
+('2024-01-15', '13:00', 1, 4), ('2024-01-15', '21:00', 1, 4),
+('2024-01-15', '14:00', 1, 5), ('2024-01-15', '22:00', 1, 5),
+('2024-01-15', '15:00', 1, 6), ('2024-01-15', '23:00', 1, 6),
+('2024-01-15', '16:00', 1, 7), ('2024-01-15', '19:30', 1, 7),
+('2024-01-15', '17:00', 1, 8), ('2024-01-15', '20:30', 1, 8),
+
+-- Movie 2 (Avengers: Endgame) in all theaters
+('2024-01-16', '10:00', 2, 1), ('2024-01-16', '18:00', 2, 1),
+('2024-01-16', '11:00', 2, 2), ('2024-01-16', '19:00', 2, 2),
+('2024-01-16', '12:00', 2, 3), ('2024-01-16', '20:00', 2, 3),
+('2024-01-16', '13:00', 2, 4), ('2024-01-16', '21:00', 2, 4),
+('2024-01-16', '14:00', 2, 5), ('2024-01-16', '22:00', 2, 5),
+('2024-01-16', '15:00', 2, 6), ('2024-01-16', '23:00', 2, 6),
+('2024-01-16', '16:00', 2, 7), ('2024-01-16', '19:30', 2, 7),
+('2024-01-16', '17:00', 2, 8), ('2024-01-16', '20:30', 2, 8),
+
+-- Movie 3 (Top Gun: Maverick) in all theaters
+('2024-01-17', '10:00', 3, 1), ('2024-01-17', '18:00', 3, 1),
+('2024-01-17', '11:00', 3, 2), ('2024-01-17', '19:00', 3, 2),
+('2024-01-17', '12:00', 3, 3), ('2024-01-17', '20:00', 3, 3),
+('2024-01-17', '13:00', 3, 4), ('2024-01-17', '21:00', 3, 4),
+('2024-01-17', '14:00', 3, 5), ('2024-01-17', '22:00', 3, 5),
+('2024-01-17', '15:00', 3, 6), ('2024-01-17', '23:00', 3, 6),
+('2024-01-17', '16:00', 3, 7), ('2024-01-17', '19:30', 3, 7),
+('2024-01-17', '17:00', 3, 8), ('2024-01-17', '20:30', 3, 8),
+
+-- Movie 4 (The Batman) in all theaters
+('2024-01-18', '10:00', 4, 1), ('2024-01-18', '18:00', 4, 1),
+('2024-01-18', '11:00', 4, 2), ('2024-01-18', '19:00', 4, 2),
+('2024-01-18', '12:00', 4, 3), ('2024-01-18', '20:00', 4, 3),
+('2024-01-18', '13:00', 4, 4), ('2024-01-18', '21:00', 4, 4),
+('2024-01-18', '14:00', 4, 5), ('2024-01-18', '22:00', 4, 5),
+('2024-01-18', '15:00', 4, 6), ('2024-01-18', '23:00', 4, 6),
+('2024-01-18', '16:00', 4, 7), ('2024-01-18', '19:30', 4, 7),
+('2024-01-18', '17:00', 4, 8), ('2024-01-18', '20:30', 4, 8),
+
+-- Movie 5 (Pathaan) in all theaters
+('2024-01-19', '10:00', 5, 1), ('2024-01-19', '18:00', 5, 1),
+('2024-01-19', '11:00', 5, 2), ('2024-01-19', '19:00', 5, 2),
+('2024-01-19', '12:00', 5, 3), ('2024-01-19', '20:00', 5, 3),
+('2024-01-19', '13:00', 5, 4), ('2024-01-19', '21:00', 5, 4),
+('2024-01-19', '14:00', 5, 5), ('2024-01-19', '22:00', 5, 5),
+('2024-01-19', '15:00', 5, 6), ('2024-01-19', '23:00', 5, 6),
+('2024-01-19', '16:00', 5, 7), ('2024-01-19', '19:30', 5, 7),
+('2024-01-19', '17:00', 5, 8), ('2024-01-19', '20:30', 5, 8),
+
+-- Movie 6 (RRR) in all theaters
+('2024-01-20', '10:00', 6, 1), ('2024-01-20', '18:00', 6, 1),
+('2024-01-20', '11:00', 6, 2), ('2024-01-20', '19:00', 6, 2),
+('2024-01-20', '12:00', 6, 3), ('2024-01-20', '20:00', 6, 3),
+('2024-01-20', '13:00', 6, 4), ('2024-01-20', '21:00', 6, 4),
+('2024-01-20', '14:00', 6, 5), ('2024-01-20', '22:00', 6, 5),
+('2024-01-20', '15:00', 6, 6), ('2024-01-20', '23:00', 6, 6),
+('2024-01-20', '16:00', 6, 7), ('2024-01-20', '19:30', 6, 7),
+('2024-01-20', '17:00', 6, 8), ('2024-01-20', '20:30', 6, 8),
+
+-- Movie 7 (Dangal) in all theaters
+('2024-01-21', '10:00', 7, 1), ('2024-01-21', '18:00', 7, 1),
+('2024-01-21', '11:00', 7, 2), ('2024-01-21', '19:00', 7, 2),
+('2024-01-21', '12:00', 7, 3), ('2024-01-21', '20:00', 7, 3),
+('2024-01-21', '13:00', 7, 4), ('2024-01-21', '21:00', 7, 4),
+('2024-01-21', '14:00', 7, 5), ('2024-01-21', '22:00', 7, 5),
+('2024-01-21', '15:00', 7, 6), ('2024-01-21', '23:00', 7, 6),
+('2024-01-21', '16:00', 7, 7), ('2024-01-21', '19:30', 7, 7),
+('2024-01-21', '17:00', 7, 8), ('2024-01-21', '20:30', 7, 8),
+
+-- Movie 8 (Vikram) in all theaters
+('2024-01-22', '10:00', 8, 1), ('2024-01-22', '18:00', 8, 1),
+('2024-01-22', '11:00', 8, 2), ('2024-01-22', '19:00', 8, 2),
+('2024-01-22', '12:00', 8, 3), ('2024-01-22', '20:00', 8, 3),
+('2024-01-22', '13:00', 8, 4), ('2024-01-22', '21:00', 8, 4),
+('2024-01-22', '14:00', 8, 5), ('2024-01-22', '22:00', 8, 5),
+('2024-01-22', '15:00', 8, 6), ('2024-01-22', '23:00', 8, 6),
+('2024-01-22', '16:00', 8, 7), ('2024-01-22', '19:30', 8, 7),
+('2024-01-22', '17:00', 8, 8), ('2024-01-22', '20:30', 8, 8),
+
+-- Movie 9 (Pushpa: The Rise) in all theaters
+('2024-01-23', '10:00', 9, 1), ('2024-01-23', '18:00', 9, 1),
+('2024-01-23', '11:00', 9, 2), ('2024-01-23', '19:00', 9, 2),
+('2024-01-23', '12:00', 9, 3), ('2024-01-23', '20:00', 9, 3),
+('2024-01-23', '13:00', 9, 4), ('2024-01-23', '21:00', 9, 4),
+('2024-01-23', '14:00', 9, 5), ('2024-01-23', '22:00', 9, 5),
+('2024-01-23', '15:00', 9, 6), ('2024-01-23', '23:00', 9, 6),
+('2024-01-23', '16:00', 9, 7), ('2024-01-23', '19:30', 9, 7),
+('2024-01-23', '17:00', 9, 8), ('2024-01-23', '20:30', 9, 8),
+
+-- Movie 10 (John Wick: Chapter 4) in all theaters
+('2024-01-24', '10:00', 10, 1), ('2024-01-24', '18:00', 10, 1),
+('2024-01-24', '11:00', 10, 2), ('2024-01-24', '19:00', 10, 2),
+('2024-01-24', '12:00', 10, 3), ('2024-01-24', '20:00', 10, 3),
+('2024-01-24', '13:00', 10, 4), ('2024-01-24', '21:00', 10, 4),
+('2024-01-24', '14:00', 10, 5), ('2024-01-24', '22:00', 10, 5),
+('2024-01-24', '15:00', 10, 6), ('2024-01-24', '23:00', 10, 6),
+('2024-01-24', '16:00', 10, 7), ('2024-01-24', '19:30', 10, 7),
+('2024-01-24', '17:00', 10, 8), ('2024-01-24', '20:30', 10, 8);
+
+
