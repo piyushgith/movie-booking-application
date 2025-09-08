@@ -6,7 +6,8 @@ public enum LocationType {
     BANGALORE("Bangalore"),
     CHENNAI("Chennai"),
     DELHI("Delhi"),
-    MUMBAI("Mumbai");
+    MUMBAI("Mumbai"),
+    HYDERABAD("Hyderabad");
 
     private final String displayName;
 

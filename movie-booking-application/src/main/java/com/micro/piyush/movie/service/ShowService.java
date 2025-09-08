@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -67,9 +68,7 @@ public class ShowService {
                     // Add the new showtime to the existing movie
                     List<String> temp = movieDto.getTimings();
                     temp.add(show.getTime().toString());
-                    //sorting
-                    temp = temp.stream().sorted().collect(Collectors.toList());
-                    //temp = sortStringTimings(temp);
+                    temp = convertAndSortTimes(temp);
                     movieDto.setTimings(temp);
                     movieExists = true;
                     break;
@@ -81,7 +80,7 @@ public class ShowService {
                 MovieDTO movieDto = new MovieDTO();
                 movieDto.setId(show.getMovie().getId());
                 movieDto.setTitle(show.getMovie().getMovieName());
-                movieDto.setPosterUrl("https://placehold.co/400x600/1e293b/d1d5db?text=\n+\n"
+                movieDto.setPosterUrl("https://placehold.co/400x600/702963/FFFFFF?text=\n+\n"
                         + show.getMovie().getMovieName());
                 movieDto.setTheatre(show.getTheater().getName());
                 List<String> timings = new ArrayList<>();
@@ -105,15 +104,33 @@ public class ShowService {
      * @return A new List of Strings with the formatted times, sorted
      * chronologically.
      */
-    public static List<String> sortStringTimings(List<String> stringTimes) {
-        // Define the formatter for the desired output format (e.g., "5:00 PM")
+    public static List<String> convertAndSortTimes(List<String> stringTimes) {
+        // Formatter for 24-hour format (HH:mm)
+        DateTimeFormatter formatter24 = DateTimeFormatter.ofPattern("HH:mm");
+        // Formatter for 12-hour format with AM/PM (h:mm a)
+        DateTimeFormatter formatter12 = DateTimeFormatter.ofPattern("h:mm a");
+        // Output formatter for h:mm a
         DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("h:mm a");
 
-        // Convert strings to LocalTime objects, sort them, and then format them back to strings
         return stringTimes.stream()
-                .map(LocalTime::parse) // Parses each string to a LocalTime object
-                .sorted() // Sorts the LocalTime objects chronologically
-                .map(time -> time.format(outputFormatter)) // Formats the sorted times
+                .filter(time -> time != null && !time.trim().isEmpty()) // Filter out null or empty strings
+                .map(time -> {
+                    try {
+                        // Try parsing as 24-hour format
+                        return LocalTime.parse(time, formatter24);
+                    } catch (DateTimeParseException e1) {
+                        try {
+                            // Try parsing as 12-hour format with AM/PM
+                            return LocalTime.parse(time, formatter12);
+                        } catch (DateTimeParseException e2) {
+                            // Skip invalid formats by returning null
+                            return null;
+                        }
+                    }
+                })
+                .filter(time -> time != null) // Remove nulls from failed parses
+                .sorted() // Sort chronologically
+                .map(time -> time.format(outputFormatter)) // Format to h:mm a
                 .collect(Collectors.toList());
     }
 
