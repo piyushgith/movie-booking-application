@@ -1,6 +1,7 @@
 package com.micro.piyush.movie.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.micro.piyush.movie.enums.SeatType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -58,6 +59,7 @@ public class ShowSeat {
 
     // Relationships
     @OneToMany(mappedBy = "showSeat", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     private List<TicketSeat> ticketSeats;
 
 }

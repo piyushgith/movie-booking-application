@@ -39,5 +39,6 @@ public class Theater {
     private List<Show> shows;
 
     @OneToMany(mappedBy = "theater", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    @JsonManagedReference
     private List<ShowSeat> showSeats;
 }

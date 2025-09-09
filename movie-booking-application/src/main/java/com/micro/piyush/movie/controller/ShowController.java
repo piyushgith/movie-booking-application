@@ -19,7 +19,7 @@ public class ShowController {
     @Autowired
     private ShowService showService;
 
-    @PostMapping("/addNew")
+/*    @PostMapping("/addNew")
     public ResponseEntity<String> addShow(@RequestBody ShowRequest showRequest) {
         try {
             String result = showService.addShow(showRequest);
@@ -37,7 +37,7 @@ public class ShowController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-    }
+    }*/
 
     @GetMapping("/findShow/{movieId}")
     public ResponseEntity<ShowsResponseDTO> findShow(@PathVariable("movieId") Integer movieId) {

@@ -1,5 +1,6 @@
 package com.micro.piyush.movie.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -11,24 +12,24 @@ import lombok.*;
 @Getter
 @Entity
 @Table(name = "ticket_seat")
-@IdClass(TicketSeatId.class)
 public class TicketSeat {
 
-    @Id
-    @Column(name = "ticket_id")
-    private Integer ticketId;
+    @EmbeddedId
+    private TicketSeatId id;
 
-    @Id
-    @Column(name = "show_seat_id")
-    private Integer showSeatId;
+//    @Column(name = "show_seat_id")
+//    private Integer showSeatId;
 
-    // Relationships
+    @MapsId("ticketId") // Maps ticketId to the ticket relationship
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ticket_id", insertable = false, updatable = false)
+    @JoinColumn(name = "ticket_id", nullable = false)
+    @JsonIgnore
     private Ticket ticket;
 
+    @MapsId("showSeatId") // Maps showSeatId to the showSeat relationship
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "show_seat_id", insertable = false, updatable = false)
+    @JoinColumn(name = "show_seat_id", nullable = false)
+    @JsonIgnore
     private ShowSeat showSeat;
 
 }

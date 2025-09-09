@@ -37,4 +37,9 @@ public class Show {
     @JoinColumn(name = "theater_id", nullable = false)
     @JsonBackReference
     private Theater theater;
+
+    @OneToMany(mappedBy = "show", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JsonBackReference
+    private java.util.List<ShowSeat> showSeats;
+
 }

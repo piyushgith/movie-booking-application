@@ -143,3 +143,67 @@ INSERT INTO show (date, time, movie_id, theater_id) VALUES
 ('2024-01-24', '17:00', 10, 8), ('2024-01-24', '20:30', 10, 8);
 
 
+-- More dynamic approach using number generation
+INSERT INTO SHOW_SEAT (is_available, is_food_contains, price, seat_no, seat_type, theater_id, show_id)
+WITH row_generator AS (
+    SELECT 'A' as row_char
+    UNION ALL SELECT 'B'
+    UNION ALL SELECT 'C'
+    UNION ALL SELECT 'D'
+    UNION ALL SELECT 'E'
+    UNION ALL SELECT 'F'
+    UNION ALL SELECT 'G'
+    UNION ALL SELECT 'H'
+),
+column_generator AS (
+    SELECT 1 as col_num
+    UNION ALL SELECT 2
+    UNION ALL SELECT 3
+    UNION ALL SELECT 4
+    UNION ALL SELECT 5
+    UNION ALL SELECT 6
+    UNION ALL SELECT 7
+    UNION ALL SELECT 8
+    UNION ALL SELECT 9
+    UNION ALL SELECT 10
+),
+all_seats AS (
+    SELECT
+        rg.row_char,
+        cg.col_num,
+        CONCAT(rg.row_char, cg.col_num) as full_seat_no
+    FROM row_generator rg
+    CROSS JOIN column_generator cg
+),
+seat_pricing AS (
+    SELECT
+        aset.row_char,
+        aset.col_num,
+        aset.full_seat_no,
+        CASE
+            WHEN aset.row_char IN ('A', 'B') THEN 'PREMIUM'
+            WHEN aset.row_char IN ('C', 'D', 'E') THEN 'STANDARD'
+            ELSE 'REGULAR'
+        END as seat_category,
+        CASE
+            WHEN aset.row_char IN ('A', 'B') THEN 250
+            WHEN aset.row_char IN ('C', 'D', 'E') THEN 200
+            ELSE 150
+        END as seat_price,
+        CASE
+            WHEN aset.col_num IN (3, 7) THEN TRUE
+            ELSE FALSE
+        END as food_available
+    FROM all_seats aset
+)
+SELECT
+    TRUE as is_available,
+    sp.food_available as is_food_contains,
+    sp.seat_price as price,
+    sp.full_seat_no as seat_no,
+    sp.seat_category as seat_type,
+    s.theater_id,
+    s.show_id
+FROM SHOW s
+CROSS JOIN seat_pricing sp
+ORDER BY s.show_id, sp.row_char, sp.col_num;

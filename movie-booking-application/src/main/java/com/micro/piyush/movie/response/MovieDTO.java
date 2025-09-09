@@ -20,6 +20,8 @@ public class MovieDTO implements Serializable {
     private String posterUrl;
     private String theatre;
     private List<String> timings;
+    private Integer showId;
+    private Integer theaterId;
 
     @Override
     public boolean equals(Object o) {
