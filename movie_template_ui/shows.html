@@ -126,7 +126,7 @@
                         <p class="text-gray-600 text-sm mb-2"><strong>Theatre:</strong> ${movie.theatre}</p>
                         <div class="showtimes flex flex-wrap gap-2">
                             ${movie.timings.map(time =>
-                    `<button class="showtime-btn px-3 py-1 bg-indigo-600 text-white text-xs font-medium rounded-full hover:bg-indigo-700 transition duration-300" data-id="${movie.id}" data-time="${time}">
+                    `<button class="showtime-btn px-3 py-1 bg-indigo-600 text-white text-xs font-medium rounded-full hover:bg-indigo-700 transition duration-300" data-id="${movie.showId}" data-time="${time}">
                                 ${time}
                             </button>`).join("")}
                         </div>
@@ -138,9 +138,9 @@
             // Add event listeners to showtime buttons
             document.querySelectorAll(".showtime-btn").forEach(btn => {
                 btn.addEventListener("click", () => {
-                    const movieId = btn.getAttribute("data-id");
+                    const showId = btn.getAttribute("data-id");
                     const time = btn.getAttribute("data-time");
-                    window.location.href = `seats.html?movieId=${movieId}&time=${encodeURIComponent(time)}`;
+                    window.location.href = `seats.html?showId=${showId}&time=${encodeURIComponent(time)}`;
                 });
             });
         }
@@ -175,16 +175,16 @@
         if (movieId) {
             // Case 2: Opened from movie page with a movieId
             locationSearchContainer.classList.add('hidden'); // Hide location dropdown and search button
-            fetchAndDisplayShows(`http://localhost:8080/show/findShow/${movieId}`, locationSelect.value);
+            fetchAndDisplayShows(`http://localhost:8080/shows/findShow/${movieId}`, locationSelect.value);
         } else {
             // Case 1: Opened from the navigation bar
             loadShowsBtn.addEventListener("click", () => {
                 const location = locationSelect.value.toUpperCase();
-                fetchAndDisplayShows(`http://localhost:8080/show/findShowByLocation/${location}`, location);
+                fetchAndDisplayShows(`http://localhost:8080/shows/findShowByLocation/${location}`, location);
             });
             // Initial load for the default location
             const defaultLocation = locationSelect.value.toUpperCase();
-            fetchAndDisplayShows(`http://localhost:8080/show/findShowByLocation/${defaultLocation}`, defaultLocation);
+            fetchAndDisplayShows(`http://localhost:8080/shows/findShowByLocation/${defaultLocation}`, defaultLocation);
         }
     </script>
 </body>

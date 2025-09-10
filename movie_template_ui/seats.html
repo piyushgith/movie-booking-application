@@ -69,6 +69,16 @@
                 class="bg-gray-300 h-8 mt-4 mx-auto w-3/4 md:w-1/2 rounded-md text-center leading-8 font-bold text-gray-800 shadow-lg">
                 SCREEN</div>
 
+            <!-- Loading indicator -->
+            <div id="loading" class="mt-6 text-center hidden">
+                <p>Loading seats...</p>
+            </div>
+
+            <!-- Error message -->
+            <div id="errorMessage" class="mt-6 text-center text-red-500 hidden">
+                <p>Error loading seats. Please try again.</p>
+            </div>
+
             <!-- Seat Layout Grid -->
             <!-- The grid will be populated dynamically by JavaScript -->
             <div class="mt-6 flex flex-col items-center gap-2" id="seatLayout"></div>
@@ -94,41 +104,181 @@
     </main>
 
     <script>
-        // Define the price per seat
-        const seatPrice = 200;
-
         // Get references to DOM elements
         const seatLayout = document.getElementById("seatLayout");
         const selectedSeatsEl = document.getElementById("selectedSeats");
         const totalPriceEl = document.getElementById("totalPrice");
         const proceedBtn = document.getElementById("proceedBtn");
         const clearBtn = document.getElementById("clearBtn");
+        const loadingEl = document.getElementById("loading");
+        const errorMessageEl = document.getElementById("errorMessage");
+        const movieTitleEl = document.getElementById("movieTitle");
 
         // Initialize an empty array for selected seats
         let selectedSeats = [];
+        let seatData = [];
+        let showId = null;
 
-        // Simulate data from an API call
-        const seatData = {
-            rows: 8,
-            cols: 10,
-            // A set of pre-booked seats for demonstration
-            bookedSeats: new Set(["A3", "A4", "B5", "B6", "D1", "F9"])
-        };
+        // Get showId from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        showId = urlParams.get('showId');
+
+        if (!showId) {
+            errorMessageEl.textContent = "No show selected. Please go back and select a show.";
+            errorMessageEl.classList.remove("hidden");
+            loadingEl.classList.add("hidden");
+        }
+
+        /**
+         * Fetches CSRF token from a cookie named 'XSRF-TOKEN'.
+         * @returns {string|null} The CSRF token or null if not found.
+         */
+        function getCsrfToken() {
+            const name = 'XSRF-TOKEN';
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        /**
+          * Fetches seat data from the Spring Boot API
+          */
+        async function fetchSeats() {
+            if (!showId) return;
+
+            try {
+                loadingEl.classList.remove("hidden");
+                errorMessageEl.classList.add("hidden");
+
+                const response = await fetch(`http://127.0.0.1:8080/shows_seat/${showId}/seats`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const seats = await response.json();
+                seatData = seats;
+
+                // Get show details for title
+                const showResponse = await fetch(`http://127.0.0.1:8080/shows/${showId}`);
+                if (showResponse.ok) {
+                    const show = await showResponse.json();
+                    movieTitleEl.textContent = `${show.movieName} - ${show.theaterName}`;
+                }
+
+                renderSeats();
+            } catch (error) {
+                console.error("Error fetching seats:", error);
+                errorMessageEl.classList.remove("hidden");
+            } finally {
+                loadingEl.classList.add("hidden");
+            }
+        }
+
+        /**
+          * Renders the seat layout based on fetched data
+          */
+        function renderSeats() {
+            seatLayout.innerHTML = ""; // Clear existing seats
+
+            if (seatData.length === 0) {
+                errorMessageEl.textContent = "No seats available for this show.";
+                errorMessageEl.classList.remove("hidden");
+                return;
+            }
+
+            // Group seats by row
+            const seatsByRow = {};
+            seatData.forEach(seat => {
+                const row = seat.seatNo.charAt(0);
+                if (!seatsByRow[row]) {
+                    seatsByRow[row] = [];
+                }
+                seatsByRow[row].push(seat);
+            });
+
+            // Sort rows
+            const sortedRows = Object.keys(seatsByRow).sort();
+
+            sortedRows.forEach(row => {
+                const rowContainer = document.createElement("div");
+                rowContainer.classList.add("flex", "items-center", "gap-2");
+
+                // Create the row label
+                const rowLabel = document.createElement("div");
+                rowLabel.classList.add("w-6", "h-6", "text-center", "font-bold");
+                rowLabel.textContent = row;
+                rowContainer.appendChild(rowLabel);
+
+                // Create a flex container for just the seats
+                const seatRow = document.createElement("div");
+                seatRow.classList.add("flex", "justify-center", "gap-1.5");
+
+                // Sort seats by number within the row
+                seatsByRow[row].sort((a, b) => {
+                    const numA = parseInt(a.seatNo.substring(1));
+                    const numB = parseInt(b.seatNo.substring(1));
+                    return numA - numB;
+                });
+
+                seatsByRow[row].forEach(seat => {
+                    const seatDiv = document.createElement("div");
+                    seatDiv.dataset.seatId = seat.seatId;
+                    seatDiv.dataset.seatNo = seat.seatNo;
+                    seatDiv.dataset.price = seat.price;
+
+                    // Base Tailwind classes for a seat
+                    seatDiv.classList.add(
+                        "w-8", "h-8", "rounded-md", "cursor-pointer", "text-center",
+                        "leading-8", "text-sm", "font-bold", "flex", "items-center",
+                        "justify-center", "transition-colors", "duration-200"
+                    );
+
+                    if (!seat.isAvailable) {
+                        // Booked seats are styled differently and are not clickable
+                        seatDiv.classList.add("bg-booked", "cursor-not-allowed");
+                        seatDiv.textContent = seat.seatNo.substring(1);
+                    } else {
+                        // Available seats are styled and have a click event listener
+                        seatDiv.classList.add("bg-available", "hover:bg-green-600");
+                        seatDiv.addEventListener("click", () => toggleSeat(seat.seatId, seat.seatNo, seat.price, seatDiv));
+                        seatDiv.textContent = seat.seatNo.substring(1);
+                    }
+
+                    seatRow.appendChild(seatDiv);
+                });
+
+                rowContainer.appendChild(seatRow);
+                seatLayout.appendChild(rowContainer);
+            });
+        }
 
         /**
           * Toggles the selection state of a seat and updates the UI.
-          * @param {string} seatId - The ID of the seat (e.g., "A1").
+          * @param {number} seatId - The ID of the seat.
+          * @param {string} seatNo - The seat number (e.g., "A1").
+          * @param {number} price - The price of the seat.
           * @param {HTMLElement} seatDiv - The seat's DOM element.
           */
-        function toggleSeat(seatId, seatDiv) {
-            if (selectedSeats.includes(seatId)) {
+        function toggleSeat(seatId, seatNo, price, seatDiv) {
+            const selectedIndex = selectedSeats.findIndex(s => s.seatId === seatId);
+
+            if (selectedIndex !== -1) {
                 // If the seat is already selected, un-select it
-                selectedSeats = selectedSeats.filter(s => s !== seatId);
+                selectedSeats.splice(selectedIndex, 1);
                 seatDiv.classList.remove("bg-selected", "text-white");
                 seatDiv.classList.add("bg-available", "hover:bg-green-600");
             } else {
                 // If the seat is not selected, select it
-                selectedSeats.push(seatId);
+                selectedSeats.push({ seatId, seatNo, price });
                 seatDiv.classList.remove("bg-available", "hover:bg-green-600");
                 seatDiv.classList.add("bg-selected", "text-white");
             }
@@ -139,8 +289,19 @@
           * Updates the booking summary section with the current selection.
           */
         function updateSummary() {
-            selectedSeatsEl.textContent = selectedSeats.length ? selectedSeats.sort().join(", ") : "None";
-            totalPriceEl.textContent = selectedSeats.length * seatPrice;
+            if (selectedSeats.length > 0) {
+                selectedSeatsEl.textContent = selectedSeats
+                    .map(s => s.seatNo)
+                    .sort()
+                    .join(", ");
+
+                const total = selectedSeats.reduce((sum, seat) => sum + seat.price, 0);
+                totalPriceEl.textContent = total;
+            } else {
+                selectedSeatsEl.textContent = "None";
+                totalPriceEl.textContent = "0";
+            }
+
             // Enable or disable buttons based on whether seats are selected
             proceedBtn.disabled = selectedSeats.length === 0;
             clearBtn.disabled = selectedSeats.length === 0;
@@ -156,59 +317,87 @@
                 seat.classList.remove("bg-selected", "text-white");
                 seat.classList.add("bg-available", "hover:bg-green-600");
             });
+
             // Clear the selectedSeats array and update the summary
             selectedSeats = [];
             updateSummary();
         }
 
         /**
-          * Loads and renders the seat layout based on the provided data.
+          * Proceeds to booking with the selected seats
           */
-        function loadSeats() {
-            const { rows, cols, bookedSeats } = seatData;
-            seatLayout.innerHTML = ""; // Clear existing seats
+        async function proceedToBooking() {
+            if (selectedSeats.length === 0) return;
 
-            for (let r = 0; r < rows; r++) {
-                // Create a flex container for the row label and seats
-                const rowContainer = document.createElement("div");
-                rowContainer.classList.add("flex", "items-center", "gap-2");
+            try {
+                const userId = sessionStorage.getItem('userId') || 1; // Default to 1 for demo
 
-                // Create the row label (A, B, C, etc.)
-                const rowLabel = document.createElement("div");
-                rowLabel.classList.add("w-6", "h-6", "text-center", "font-bold");
-                rowLabel.textContent = String.fromCharCode(65 + r);
-                rowContainer.appendChild(rowLabel);
+                const bookingData = {
+                    userId: parseInt(userId),
+                    showId: parseInt(showId),
+                    seatIds: selectedSeats.map(seat => seat.seatId)
+                };
 
-                // Create a flex container for just the seats to ensure even spacing
-                const seatRow = document.createElement("div");
-                seatRow.classList.add("flex", "justify-center", "gap-1.5");
+                const csrfToken = getCsrfToken();
 
-                for (let c = 1; c <= cols; c++) {
-                    const seatId = String.fromCharCode(65 + r) + c;
-                    const seatDiv = document.createElement("div");
+                const response = await fetch('http://localhost:8080/tickets/book', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'//,
+                        //'X-XSRF-TOKEN': csrfToken // Add the CSRF token to the header
+                    },
+                    //credentials: 'include', // Important to send cookies for the CSRF token
+                    body: JSON.stringify(bookingData)
+                });
 
-                    // Base Tailwind classes for a seat
-                    seatDiv.classList.add("w-8", "h-8", "rounded-md", "cursor-pointer", "text-center", "leading-8", "text-sm", "font-bold", "flex", "items-center", "justify-center", "transition-colors", "duration-200");
-
-                    if (bookedSeats.has(seatId)) {
-                        // Booked seats are styled differently and are not clickable
-                        seatDiv.classList.add("bg-booked", "cursor-not-allowed");
-                    } else {
-                        // Available seats are styled and have a click event listener
-                        seatDiv.classList.add("bg-available", "hover:bg-green-600");
-                        seatDiv.addEventListener("click", () => toggleSeat(seatId, seatDiv));
-                    }
-
-                    seatDiv.textContent = c;
-                    seatRow.appendChild(seatDiv);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Booking failed: ${errorText}`);
                 }
-                rowContainer.appendChild(seatRow);
-                seatLayout.appendChild(rowContainer);
+
+                const result = await response.json();
+                // Replace alert with a custom message box to avoid breaking the iframe
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('fixed', 'inset-0', 'flex', 'items-center', 'justify-center', 'bg-gray-900', 'bg-opacity-50', 'z-50');
+                messageBox.innerHTML = `
+                    <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+                        <h3 class="text-2xl font-bold mb-4 text-gray-800">Booking Successful!</h3>
+                        <p class="text-lg text-gray-600 mb-2">Ticket ID: <span class="font-semibold">${result.ticketId}</span></p>
+                        <p class="text-lg text-gray-600 mb-4">Total Amount: ₹<span class="font-semibold">${result.totalAmount}</span></p>
+                        <button id="close-msg-box" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200">
+                            OK
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(messageBox);
+                document.getElementById('close-msg-box').addEventListener('click', () => {
+                    messageBox.remove();
+                    window.location.href = 'booking_history.html';
+                });
+
+            } catch (error) {
+                console.error("Booking error:", error);
+                const messageBox = document.createElement('div');
+                messageBox.classList.add('fixed', 'inset-0', 'flex', 'items-center', 'justify-center', 'bg-gray-900', 'bg-opacity-50', 'z-50');
+                messageBox.innerHTML = `
+                    <div class="bg-white p-8 rounded-lg shadow-xl text-center">
+                        <h3 class="text-2xl font-bold mb-4 text-red-600">Booking Failed</h3>
+                        <p class="text-lg text-gray-600 mb-4">${error.message}</p>
+                        <button id="close-msg-box" class="px-6 py-2 bg-red-600 text-white font-semibold rounded-full hover:bg-red-700 transition-colors duration-200">
+                            OK
+                        </button>
+                    </div>
+                `;
+                document.body.appendChild(messageBox);
+                document.getElementById('close-msg-box').addEventListener('click', () => {
+                    messageBox.remove();
+                });
             }
         }
 
-        // Add event listener for the new clear button
+        // Add event listeners
         clearBtn.addEventListener("click", clearSelection);
+        proceedBtn.addEventListener("click", proceedToBooking);
 
         // Add logout functionality
         document.getElementById('logoutBtn').addEventListener('click', () => {
@@ -218,7 +407,9 @@
         });
 
         // Initial load of the seat map
-        loadSeats();
+        if (showId) {
+            fetchSeats();
+        }
 
         // Initial update of the summary
         updateSummary();

@@ -1,18 +1,15 @@
 package com.micro.piyush.movie.controller;
 
 import com.micro.piyush.movie.request.BookTicketRequest;
-import com.micro.piyush.movie.request.TicketRequest;
 import com.micro.piyush.movie.response.BookTicketResponse;
-import com.micro.piyush.movie.response.TicketResponse;
 import com.micro.piyush.movie.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/ticket")
+@RequestMapping("/tickets")
 @CrossOrigin(origins = "*")
 public class TicketController {
 

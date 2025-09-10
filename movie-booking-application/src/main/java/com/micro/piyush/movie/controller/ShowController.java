@@ -22,7 +22,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/show")
+@RequestMapping("/shows")
 @CrossOrigin(origins = "*")
 public class ShowController {
 
