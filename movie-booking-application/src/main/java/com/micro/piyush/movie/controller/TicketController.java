@@ -1,6 +1,8 @@
 package com.micro.piyush.movie.controller;
 
+import com.micro.piyush.movie.request.BookTicketRequest;
 import com.micro.piyush.movie.request.TicketRequest;
+import com.micro.piyush.movie.response.BookTicketResponse;
 import com.micro.piyush.movie.response.TicketResponse;
 import com.micro.piyush.movie.service.TicketService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +19,7 @@ public class TicketController {
     @Autowired
     private TicketService ticketService;
 
-    @PostMapping("/book")
+/*    @PostMapping("/book1")
     public ResponseEntity<Object> ticketBooking(@RequestBody TicketRequest ticketRequest) {
         try {
             TicketResponse result = ticketService.ticketBooking(ticketRequest);
@@ -25,6 +27,12 @@ public class TicketController {
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
+    }*/
+
+    @PostMapping("/book")
+    public ResponseEntity<BookTicketResponse> bookTicket(@RequestBody BookTicketRequest request) {
+        BookTicketResponse response = ticketService.bookShowTicket(request);
+        return ResponseEntity.ok(response);
     }
 }
 

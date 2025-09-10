@@ -8,13 +8,20 @@ import com.micro.piyush.movie.exception.ShowDoesNotExists;
 import com.micro.piyush.movie.exception.TheaterDoesNotExists;
 import com.micro.piyush.movie.mapper.ShowMapper;
 import com.micro.piyush.movie.repository.*;
+import com.micro.piyush.movie.request.ShowDto;
 import com.micro.piyush.movie.request.ShowRequest;
+import com.micro.piyush.movie.request.ShowSearchRequest;
 import com.micro.piyush.movie.request.ShowSeatRequest;
 import com.micro.piyush.movie.response.MovieDTO;
+import com.micro.piyush.movie.response.ShowResponse;
 import com.micro.piyush.movie.response.ShowsResponseDTO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -22,6 +29,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional(readOnly = true)
 public class ShowService {
 
     @Autowired
@@ -136,4 +144,86 @@ public class ShowService {
                 .collect(Collectors.toList());
     }
 
+
+
+
+    public List<ShowDto> getAllShows() {
+        List<Show> shows = showRepository.findAll();
+        return shows.stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public ShowResponse getAllShows(Pageable pageable) {
+        Page<Show> showPage = showRepository.findAll(pageable);
+        List<ShowDto> showDtos = showPage.getContent().stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+
+        return new ShowResponse(
+                showDtos,
+                showPage.getTotalElements(),
+                showPage.getTotalPages(),
+                showPage.getNumber(),
+                showPage.getSize()
+        );
+    }
+
+    public List<ShowDto> getUpcomingShows() {
+        List<Show> shows = showRepository.findUpcomingShows();
+        return shows.stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+    }
+
+/*    public List<ShowDto> getShowsByMovieId(Integer movieId) {
+        List<Show> shows = showRepository.findByMovieId(movieId);
+        return shows.stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+    }*/
+
+    public List<ShowDto> getShowsByTheaterId(Integer theaterId) {
+        List<Show> shows = showRepository.findByTheaterId(theaterId);
+        return shows.stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<ShowDto> getShowsByDate(LocalDate date) {
+        List<Show> shows = showRepository.findByDate(date);
+        return shows.stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public ShowResponse searchShows(ShowSearchRequest request, Pageable pageable) {
+        Page<Show> showPage = showRepository.searchShows(
+                request.getMovieId(),
+                request.getTheaterId(),
+                request.getDate(),
+                request.getMovieName(),
+                request.getTheaterName(),
+                request.getLocation(),
+                pageable
+        );
+
+        List<ShowDto> showDtos = showPage.getContent().stream()
+                .map(ShowDto::new)
+                .collect(Collectors.toList());
+
+        return new ShowResponse(
+                showDtos,
+                showPage.getTotalElements(),
+                showPage.getTotalPages(),
+                showPage.getNumber(),
+                showPage.getSize()
+        );
+    }
+
+    public ShowDto getShowById(Integer showId) {
+        Show show = showRepository.findById(showId)
+                .orElseThrow(() -> new RuntimeException("Show not found with ID: " + showId));
+        return new ShowDto(show);
+    }
 }
