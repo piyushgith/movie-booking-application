@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -24,7 +25,7 @@ public class Ticket {
     private Integer ticketId;
 
     @Column(name = "booked_at")
-    private LocalDate bookedAt;
+    private LocalDateTime bookedAt;
 
     @Column(name = "total_tickets_price")
     @Min(value = 0, message = "Total price cannot be negative")

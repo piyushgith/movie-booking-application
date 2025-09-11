@@ -44,18 +44,20 @@
   </header>
 
   <main class="flex-grow">
-    <div class="max-w-4xl mx-auto my-6 p-4 sm:p-8">
+    <div class="max-w-7xl mx-auto my-6 p-4 sm:p-8">
       <h2 class="text-2xl font-semibold text-center mb-6">🎫 Your Booking History</h2>
       <div class="bg-white rounded-xl shadow-lg p-4 sm:p-8">
         <div class="overflow-x-auto">
-          <table class="w-full text-sm sm:text-base border-collapse">
+          <table class="w-full text-sm sm:text-base border-collapse table-auto">
             <thead>
               <tr>
-                <th class="p-3 sm:p-4 bg-gray-800 text-white rounded-t-lg font-medium">Transaction ID</th>
-                <th class="p-3 sm:p-4 bg-gray-800 text-white font-medium">Movie</th>
-                <th class="p-3 sm:p-4 bg-gray-800 text-white font-medium">Show Time</th>
-                <th class="p-3 sm:p-4 bg-gray-800 text-white font-medium">Seats</th>
-                <th class="p-3 sm:p-4 bg-gray-800 text-white font-medium">Booking Date</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white rounded-tl-lg font-medium">Ticket ID</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white font-medium">Movie</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white font-medium">Show Time</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white font-medium">Seats</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white font-medium">Theater</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white font-medium">Booking Date</th>
+                <th class="p-4 sm:p-6 bg-gray-800 text-white rounded-tr-lg font-medium">Total Price</th>
               </tr>
             </thead>
             <tbody id="bookingTable">
@@ -64,7 +66,6 @@
           </table>
         </div>
       </div>
-
       <a class="inline-block mt-6 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-full transition duration-300 transform hover:scale-105"
         href="homepage.html">
         ⬅ Back to Dashboard
@@ -74,35 +75,56 @@
 
   <script>
     const token = sessionStorage.getItem("token");
-    if (!token) window.location.href = "/login_animation.html";
+    const userId = sessionStorage.getItem("userId");
+    if (!token || !userId) window.location.href = "/login_animation.html";
 
     async function loadBookings() {
       try {
-        const response = await fetch("/api/user/bookings", {
+        const response = await fetch(`http://localhost:8080/tickets/user/${userId}/all`, {
           method: "GET",
-          headers: { "Authorization": "Bearer " + token }
-        });
-        const bookings = await response.json();
+          headers: { "Content-Type": "application/json" }
+        });// "Authorization": "Bearer " + token,
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const tickets = data.tickets;
 
         const table = document.getElementById("bookingTable");
         table.innerHTML = "";
 
-        if (bookings.length === 0) {
-          table.innerHTML = `<tr><td class="p-4 text-center border-b border-gray-200" colspan="5">No bookings found</td></tr>`;
+        if (tickets.length === 0) {
+          table.innerHTML = `<tr><td class="p-4 text-center border-b border-gray-200" colspan="7">No bookings found</td></tr>`;
         } else {
-          bookings.forEach(b => {
-            const row = `<tr class="hover:bg-gray-50">
-              <td class="p-3 sm:p-4 border-b border-gray-200">${b.transactionId}</td>
-              <td class="p-3 sm:p-4 border-b border-gray-200">${b.movieTitle}</td>
-              <td class="p-3 sm:p-4 border-b border-gray-200">${b.showTime}</td>
-              <td class="p-3 sm:p-4 border-b border-gray-200">${b.seats.join(", ")}</td>
-              <td class="p-3 sm:p-4 border-b border-gray-200">${new Date(b.bookingDate).toLocaleDateString()}</td>
+          tickets.forEach((ticket, index) => {
+            const bookingDate = new Date(ticket.bookingDate);
+            const formattedDate = bookingDate.toLocaleDateString();
+            const formattedTime = bookingDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            const showDate = new Date(ticket.showDate);
+            const formattedShowDate = showDate.toLocaleDateString();
+            
+            // Add a class for alternating row colors
+            const rowClass = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+            
+            const row = `<tr class="hover:bg-gray-100 ${rowClass}">
+              <td class="p-4 sm:p-6 border-b border-gray-200">${ticket.ticketId}</td>
+              <td class="p-4 sm:p-6 border-b border-gray-200">${ticket.movieName}</td>
+              <td class="p-4 sm:p-6 border-b border-gray-200">${formattedShowDate} at ${ticket.showTime}</td>
+              <td class="p-4 sm:p-6 border-b border-gray-200">${ticket.seats}</td>
+              <td class="p-4 sm:p-6 border-b border-gray-200">${ticket.theaterName}</td>
+              <td class="p-4 sm:p-6 border-b border-gray-200">${formattedDate} at ${formattedTime}</td>
+              <td class="p-4 sm:p-6 border-b border-gray-200">$${ticket.totalPrice}</td>
             </tr>`;
             table.innerHTML += row;
           });
         }
       } catch (error) {
         console.error("Error fetching bookings:", error);
+        const table = document.getElementById("bookingTable");
+        table.innerHTML = `<tr><td class="p-4 text-center border-b border-gray-200 text-red-500" colspan="7">Error loading bookings. Please try again later.</td></tr>`;
       }
     }
 
@@ -113,7 +135,8 @@
       window.location.href = '/login_animation.html';
     });
 
-    loadBookings();
+    // Initial load
+    window.addEventListener('load', loadBookings);
   </script>
 </body>
 

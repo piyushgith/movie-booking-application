@@ -11,15 +11,20 @@ import com.micro.piyush.movie.repository.TicketRepository;
 import com.micro.piyush.movie.repository.UserRepository;
 import com.micro.piyush.movie.request.BookTicketRequest;
 import com.micro.piyush.movie.request.TicketRequest;
+import com.micro.piyush.movie.request.UserTicketDto;
 import com.micro.piyush.movie.response.BookTicketResponse;
 import com.micro.piyush.movie.response.TicketResponse;
+import com.micro.piyush.movie.response.UserTicketsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class TicketService {
@@ -59,6 +64,7 @@ public class TicketService {
         Ticket ticket = new Ticket();
         ticket.setUser(user);
         ticket.setShow(show);
+        ticket.setBookedAt(java.time.LocalDateTime.now());
         ticket.setTotalTicketsPrice(totalAmount);
 
         // Save ticket first to get ID
@@ -88,5 +94,63 @@ public class TicketService {
                 .totalAmount(totalAmount)
                 .build();
     }
+
+    public UserTicketsResponse getUserTickets(Integer userId) {
+        // Validate user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Get all tickets for the user
+        List<Ticket> tickets = ticketRepository.findTicketsByUserId(userId);
+
+        // Convert to DTOs
+        List<UserTicketDto> ticketDtos = tickets.stream()
+                .map(UserTicketDto::new)
+                .collect(Collectors.toList());
+
+        return new UserTicketsResponse(ticketDtos);
+    }
+
+    public UserTicketsResponse getUserTickets(Integer userId, Pageable pageable) {
+        // Validate user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Get paginated tickets for the user
+        Page<Ticket> ticketPage = ticketRepository.findTicketsByUserId(userId, pageable);
+
+        // Convert to DTOs
+        List<UserTicketDto> ticketDtos = ticketPage.getContent().stream()
+                .map(UserTicketDto::new)
+                .collect(Collectors.toList());
+
+        return new UserTicketsResponse(
+                ticketDtos,
+                ticketPage.getTotalElements(),
+                ticketPage.getTotalPages(),
+                ticketPage.getNumber(),
+                ticketPage.getSize()
+        );
+    }
+
+    public UserTicketDto getTicketById(Integer userId, Integer ticketId) {
+        // Validate user exists
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        // Get specific ticket for the user
+        Ticket ticket = ticketRepository.findTicketByIdAndUserId(ticketId, userId)
+                .orElseThrow(() -> new RuntimeException("Ticket not found with ID: " + ticketId + " for user: " + userId));
+
+        return new UserTicketDto(ticket);
+    }
+
+    public long getUserTicketCount(Integer userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+
+        return ticketRepository.countTicketsByUserId(userId);
+    }
+
 
 }
