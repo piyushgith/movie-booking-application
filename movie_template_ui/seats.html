@@ -118,6 +118,8 @@
         let selectedSeats = [];
         let seatData = [];
         let showId = null;
+        let movieName = "";
+        let showTime = "";
 
         // Get showId from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
@@ -171,7 +173,9 @@
                 const showResponse = await fetch(`http://127.0.0.1:8080/shows/${showId}`);
                 if (showResponse.ok) {
                     const show = await showResponse.json();
-                    movieTitleEl.textContent = `${show.movieName} - ${show.theaterName}`;
+                    movieName = show.movieName;
+                    showTime = show.showTime;
+                    movieTitleEl.textContent = `${movieName} - ${show.theaterName}`;
                 }
 
                 renderSeats();
@@ -343,7 +347,7 @@
                 const response = await fetch('http://localhost:8080/tickets/book', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json'//,
+                        'Content-Type': 'application/json',
                         //'X-XSRF-TOKEN': csrfToken // Add the CSRF token to the header
                     },
                     //credentials: 'include', // Important to send cookies for the CSRF token
@@ -356,24 +360,18 @@
                 }
 
                 const result = await response.json();
-                // Replace alert with a custom message box to avoid breaking the iframe
-                const messageBox = document.createElement('div');
-                messageBox.classList.add('fixed', 'inset-0', 'flex', 'items-center', 'justify-center', 'bg-gray-900', 'bg-opacity-50', 'z-50');
-                messageBox.innerHTML = `
-                    <div class="bg-white p-8 rounded-lg shadow-xl text-center">
-                        <h3 class="text-2xl font-bold mb-4 text-gray-800">Booking Successful!</h3>
-                        <p class="text-lg text-gray-600 mb-2">Ticket ID: <span class="font-semibold">${result.bookingId}</span></p>
-                        <p class="text-lg text-gray-600 mb-4">Total Amount: ₹<span class="font-semibold">${result.totalAmount}</span></p>
-                        <button id="close-msg-box" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-full hover:bg-blue-700 transition-colors duration-200">
-                            OK
-                        </button>
-                    </div>
-                `;
-                document.body.appendChild(messageBox);
-                document.getElementById('close-msg-box').addEventListener('click', () => {
-                    messageBox.remove();
-                    window.location.href = 'booking_confirmation.html?bookingId=${bookingId}';
+                
+                // Navigate to the confirmation page with all booking details
+                const bookedSeatNos = selectedSeats.map(seat => seat.seatNo);
+                const queryParams = new URLSearchParams({
+                    bookingId: result.bookingId,
+                    totalAmount: result.totalAmount,
+                    movieName: result.movieName,
+                    showTime: result.showTime,
+                    bookedSeats: bookedSeatNos.join(',')
                 });
+                
+                window.location.href = `booking_confirmation.html?${queryParams.toString()}`;
 
             } catch (error) {
                 console.error("Booking error:", error);
