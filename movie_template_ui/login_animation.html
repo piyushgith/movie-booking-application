@@ -302,6 +302,8 @@
                 <!-- <span>or use your account</span> -->
                 <input type="email" id="emailId" placeholder="Email" value="piyush@gmail.com" />
                 <input type="password" id="password" placeholder="Password" value="prasad" />
+                <!-- get Csrf Token from spring security -->
+                <input type="hidden" id="csrfToken" value="${_csrf.token}" />
                 <!-- <a href="#">Forgot your password?</a> -->
                 <button type="submit" id="signInBtn">Sign In</button>
             </form>
@@ -412,6 +414,10 @@
                     sessionStorage.setItem("role", role);
                     sessionStorage.setItem("userId", userId);
                     sessionStorage.setItem("emailId", emailId);
+                    // set crsf token in session storage
+                    const csrfToken = document.getElementById('csrfToken').value;
+                    sessionStorage.setItem("XSRF-TOKEN", csrfToken);
+                    console.log("Token stored in sessionStorage:", csrfToken);
 
                     if (role === "ADMIN") {
                         window.location.href = "/admin/admin-dashboard.html";

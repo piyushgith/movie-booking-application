@@ -15,6 +15,7 @@ import com.micro.piyush.movie.response.BookTicketResponse;
 import com.micro.piyush.movie.response.TicketResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +36,7 @@ public class TicketService {
     @Autowired
     private ShowSeatRepository showSeatRepository;
 
-
+    @Transactional
     public BookTicketResponse bookShowTicket(BookTicketRequest request) {
         // Fetch user
         User user = userRepository.findById(request.getUserId())
@@ -68,6 +69,7 @@ public class TicketService {
         for (ShowSeat seat : requestedSeats) {
             seat.setIsAvailable(false); // Mark seat as booked
             TicketSeat ticketSeat = new TicketSeat();
+            ticketSeat.setId(new TicketSeatId(null, seat.getId()));
             ticketSeat.setTicket(ticket);
             ticketSeat.setShowSeat(seat);
             ticketSeats.add(ticketSeat);
@@ -77,10 +79,14 @@ public class TicketService {
         showSeatRepository.saveAll(requestedSeats); // Update seat availability
         ticketRepository.save(ticket); // Save ticket with ticket-seats
 
-        return new BookTicketResponse(ticket.getTicketId(), totalAmount, "Ticket booked successfully");
+        return new BookTicketResponse().builder()
+                .bookingId(ticket.getTicketId())
+                .movieName(show.getMovie().getMovieName())
+                .showTime(show.getTime().toString())
+                .message("Ticket booked successfully")
+                .bookedSeats(requestedSeats.stream().map(ShowSeat::getSeatNo).toList())
+                .totalAmount(totalAmount)
+                .build();
     }
-
-
-
 
 }

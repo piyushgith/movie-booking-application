@@ -18,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -35,7 +36,11 @@ public class SecurityConfiguration {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
                 //.csrf(c -> c.disable())
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/user/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"))
+//                .csrf(csrf -> csrf
+//                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+//                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
+
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/user/**","/tickets/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(req -> req
                         .anyRequest().permitAll() // Allow all requests without authentication

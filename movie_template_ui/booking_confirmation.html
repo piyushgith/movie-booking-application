@@ -81,8 +81,7 @@
         if (!token) window.location.href = "/login_animation.html";
 
         const params = new URLSearchParams(window.location.search);
-        const bookingId = params.get("bookingId");
-
+        
         // Get references to summary elements
         const bookingIdEl = document.getElementById("bookingId");
         const movieNameEl = document.getElementById("movieName");
@@ -90,10 +89,31 @@
         const seatsEl = document.getElementById("seats");
         const amountEl = document.getElementById("amount");
 
+        // Populate the page with data from URL parameters
+        function populateFromUrl() {
+            const bookingId = params.get("bookingId");
+            const movieName = params.get("movieName");
+            const showTime = params.get("showTime");
+            const seats = params.get("bookedSeats");
+            const totalAmount = params.get("totalAmount");
+
+            if (bookingId) {
+                bookingIdEl.textContent = bookingId;
+                movieNameEl.textContent = movieName;
+                showTimeEl.textContent = showTime;
+                seatsEl.textContent = seats;
+                amountEl.textContent = totalAmount;
+            } else {
+                // Fallback to previous logic if URL parameters are not available
+                fetchBookingDetails();
+            }
+        }
+        
         // Fetch booking details from the backend using the bookingId
         async function fetchBookingDetails() {
+            const bookingId = params.get("bookingId");
             try {
-                const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}`, {
+                const response = await fetch(`http://localhost:8080/bookings/${bookingId}`, {
                     headers: { "Authorization": "Bearer " + token }
                 });
                 if (!response.ok) throw new Error("Could not fetch booking details.");
@@ -115,7 +135,7 @@
 
             } catch (error) {
                 console.error("Error fetching booking details:", error);
-                // Fallback to localStorage data if API fails
+                // Fallback to sessionStorage data if API fails
                 bookingIdEl.textContent = bookingId;
                 showTimeEl.textContent = sessionStorage.getItem("showTime") || "N/A";
                 seatsEl.textContent = JSON.parse(sessionStorage.getItem("selectedSeats"))?.join(", ") || "N/A";
@@ -136,7 +156,7 @@
             const blob = new Blob([ticketData], { type: "text/plain" });
             const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = `Ticket_${bookingId}.txt`;
+            link.download = `Ticket_${bookingIdEl.textContent}.txt`;
             link.click();
         });
 
@@ -152,7 +172,7 @@
             window.location.href = "/login_animation.html";
         });
 
-        fetchBookingDetails();
+        populateFromUrl();
     </script>
 </body>
 
