@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -14,13 +15,15 @@
     }
   </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen flex flex-col">
 
   <!-- Header and Navigation -->
   <header class="bg-gray-900 text-white shadow-lg w-full">
     <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between">
       <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse Admin</h1>
-      <button id="logoutBtn" class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
+      <button id="logoutBtn"
+        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
         Logout
       </button>
     </div>
@@ -28,7 +31,8 @@
       <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
         <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
           <li><a href="admin-dashboard.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
-          <li><a href="admin-users.html" class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Users</a></li>
+          <li><a href="admin-users.html"
+              class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Users</a></li>
           <li><a href="admin-movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
           <li><a href="admin-shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
         </ul>
@@ -45,13 +49,31 @@
         <h3 class="text-xl font-semibold text-gray-800 mb-4">Create / Update User</h3>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <input type="hidden" id="userId">
-          <input type="text" id="email" placeholder="Email" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <input type="password" id="password" placeholder="Password" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <select id="role" class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="name" placeholder="Name"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="number" id="age" placeholder="Age"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="address" placeholder="Address"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="mobileNo" placeholder="Mobile No"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="email" id="email" placeholder="Email"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select id="genderType"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="MALE">MALE</option>
+            <option value="FEMALE">FEMALE</option>
+            <option value="OTHER">OTHER</option>
+          </select>
+          <select id="role"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             <option value="USER">USER</option>
             <option value="ADMIN">ADMIN</option>
           </select>
-          <button onclick="saveUser()" class="col-span-1 md:col-span-2 lg:col-span-3 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+          <input type="password" id="password" placeholder="Password"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <button onclick="saveUser()"
+            class="col-span-1 md:col-span-2 lg:col-span-3 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
             💾 Save User
           </button>
         </div>
@@ -64,7 +86,12 @@
           <thead class="bg-blue-600 text-white">
             <tr>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Age</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Address</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Mobile No</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Email</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Gender</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Role</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Actions</th>
             </tr>
@@ -82,55 +109,111 @@
     if (!token) window.location.href = "/login_animation.html";
 
     function fetchUsers() {
-      fetch("http://localhost:8080/api/admin/users", {
-        headers: { "Authorization": "Bearer " + token }
+      fetch("http://localhost:8080/api/admin/user/all", {
+        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
       })
-      .then(res => res.json())
-      .then(data => {
-        const table = document.getElementById("userTable");
-        table.innerHTML = "";
-        data.forEach(u => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
+        .then(res => res.json())
+        .then(data => {
+          const table = document.getElementById("userTable");
+          table.innerHTML = "";
+          data.forEach(u => {
+            const row = document.createElement("tr");
+            // Get the first role from the Set, or an empty string if the Set is null or empty
+            // const role = u.roles && u.roles.length > 0 ? u.roles[0].role : '';
+            // Get the first role from the Set, or an empty string if the Set is null or empty
+            const role = u.roles && u.roles.length > 0 ? u.roles[0].userRole : '';
+            row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.id}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${u.email}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.role}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${u.name}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.age}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.address}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.mobileNo}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${u.emailId}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${u.genderType}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${role}</td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button onclick="editUser(${u.id},'${u.email}','${u.role}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
+              <button onclick="editUser(${u.id}, '${u.name}', '${u.age}', '${u.address}', '${u.mobileNo}', '${u.emailId}', '${u.genderType}', '${role}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
               <button onclick="deleteUser(${u.id})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
             </td>
           `;
-          table.appendChild(row);
+            table.appendChild(row);
+          });
         });
-      });
     }
 
     function saveUser() {
       const id = document.getElementById("userId").value;
+
       const user = {
-        username: document.getElementById("username").value,
-        password: document.getElementById("password").value,
-        role: document.getElementById("role").value
+        name: document.getElementById("name").value,
+        age: parseInt(document.getElementById("age").value),
+        address: document.getElementById("address").value,
+        mobileNo: document.getElementById("mobileNo").value,
+        emailId: document.getElementById("email").value,
+        genderType: document.getElementById("genderType").value,
+        role: document.getElementById("role").value,
+        password: document.getElementById("password").value
       };
-      let url = "http://localhost:8080/api/admin/users";
+
+      let url = "http://localhost:8080/api/admin/user";
       let method = "POST";
-      if (id) { url += "/" + id; method = "PUT"; }
+
+      // Check if a userId exists to determine if it's a PUT or POST call
+      if (id) {
+        method = "PUT";
+        // Include the userId in the request body for the PUT call
+        user.id = parseInt(id);
+      }
 
       fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(user)
-      }).then(() => { fetchUsers(); resetForm(); });
+      }).then(() => {
+        // Assuming fetchUsers() and resetForm() are defined elsewhere
+        fetchUsers();
+        resetForm();
+      });
     }
 
-    function editUser(id, email, role) {
+
+
+    // function saveUser() {
+    //   const id = document.getElementById("userId").value;
+    //   const user = {
+    //     name: document.getElementById("name").value,
+    //     age: parseInt(document.getElementById("age").value),
+    //     address: document.getElementById("address").value,
+    //     mobileNo: document.getElementById("mobileNo").value,
+    //     emailId: document.getElementById("email").value,
+    //     genderType: document.getElementById("genderType").value,
+    //     role: document.getElementById("role").value,
+    //     password: document.getElementById("password").value
+    //   };
+    //   let url = "http://localhost:8080/api/admin/user";
+    //   let method = "POST";
+    //   if (id) { url += "/" + id; method = "PUT"; }
+
+    //   fetch(url, {
+    //     method: method,
+    //     headers: { "Content-Type": "application/json" },//, "Authorization": "Bearer " + token
+    //     body: JSON.stringify(user)
+    //   }).then(() => { fetchUsers(); resetForm(); });
+    // }
+
+    function editUser(id, name, age, address, mobileNo, emailId, genderType, role) {
       document.getElementById("userId").value = id;
-      document.getElementById("email").value = email;
+      document.getElementById("name").value = name;
+      document.getElementById("age").value = age;
+      document.getElementById("address").value = address;
+      document.getElementById("mobileNo").value = mobileNo;
+      document.getElementById("email").value = emailId;
+      document.getElementById("genderType").value = genderType;
       document.getElementById("role").value = role;
     }
 
     function deleteUser(id) {
-      fetch("http://localhost:8080/api/admin/users/" + id, {
+      fetch("http://localhost:8080/api/admin/user/" + id, {
         method: "DELETE",
         headers: { "Authorization": "Bearer " + token }
       }).then(() => fetchUsers());
@@ -138,9 +221,14 @@
 
     function resetForm() {
       document.getElementById("userId").value = "";
+      document.getElementById("name").value = "";
+      document.getElementById("age").value = "";
+      document.getElementById("address").value = "";
+      document.getElementById("mobileNo").value = "";
       document.getElementById("email").value = "";
-      document.getElementById("password").value = "";
+      document.getElementById("genderType").value = "MALE";
       document.getElementById("role").value = "USER";
+      document.getElementById("password").value = "";
     }
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
@@ -152,4 +240,5 @@
     fetchUsers();
   </script>
 </body>
+
 </html>

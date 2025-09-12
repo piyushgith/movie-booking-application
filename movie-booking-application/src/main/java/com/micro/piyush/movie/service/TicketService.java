@@ -95,6 +95,7 @@ public class TicketService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public UserTicketsResponse getUserTickets(Integer userId) {
         // Validate user exists
         User user = userRepository.findById(userId)
@@ -111,6 +112,7 @@ public class TicketService {
         return new UserTicketsResponse(ticketDtos);
     }
 
+    @Transactional(readOnly = true)
     public UserTicketsResponse getUserTickets(Integer userId, Pageable pageable) {
         // Validate user exists
         User user = userRepository.findById(userId)
@@ -133,6 +135,7 @@ public class TicketService {
         );
     }
 
+    @Transactional(readOnly = true)
     public UserTicketDto getTicketById(Integer userId, Integer ticketId) {
         // Validate user exists
         User user = userRepository.findById(userId)
@@ -145,6 +148,7 @@ public class TicketService {
         return new UserTicketDto(ticket);
     }
 
+    @Transactional(readOnly = true)
     public long getUserTicketCount(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));

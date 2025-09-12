@@ -22,7 +22,7 @@ import java.util.Optional;
 
 
 @RestController
-@RequestMapping("/user")
+@RequestMapping("/api")
 @CrossOrigin(origins = "*")
 public class UserController {
 
@@ -35,7 +35,7 @@ public class UserController {
     @Autowired
     private JWTService jwtService;
 
-    @PostMapping("/addNew")
+    @PostMapping("/admin/user")
     public ResponseEntity<Object> addNewUser(@RequestBody UserRequest userEntryDto) {
         try {
             User result = userService.addUser(userEntryDto);
@@ -45,7 +45,27 @@ public class UserController {
         }
     }
 
-    @PostMapping("/getToken")
+    @PutMapping("/admin/user")
+    public UserResponse updateUser(@RequestBody UserRequest userEntryDto) {
+        return userService.updateUser(userEntryDto);
+    }
+
+    @GetMapping("/admin/user/all")
+    public List<UserResponse> getAllUsers() {
+        return userService.getAllUsers();
+    }
+
+    @DeleteMapping("/admin/user/{id}")
+    public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
+        try {
+            userService.deleteUser(id);
+            return new ResponseEntity<>("User deleted successfully", HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @PostMapping("/user/getToken")
     public JWTTokenResponse authenticateAndGetToken(@RequestBody AuthRequest authRequest) {
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(authRequest.getEmailId(), authRequest.getPassword()));
@@ -62,16 +82,6 @@ public class UserController {
             }
         }
         throw new UsernameNotFoundException("invalid user details.");
-    }
-
-    @GetMapping("/allUsers")
-    public List<UserResponse> getAllUsers() {
-        return userService.getAllUsers();
-    }
-
-    @PutMapping("/updateUser")
-    public UserResponse updateUser(@RequestBody UserRequest userEntryDto) {
-        return userService.updateUser(userEntryDto);
     }
 
 }

@@ -97,4 +97,11 @@ public class UserService {
         updatedUser = userRepository.save(updatedUser);
         return UserMapper.userToUserDto(updatedUser);
     }
+
+    public void deleteUser(Integer id) {
+        Optional<User> user = userRepository.findById(id);
+        if (user.isPresent()) {
+            userRepository.delete(user.get());
+        }
+    }
 }

@@ -27,7 +27,7 @@ public class TicketController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userId}/limit")
     public ResponseEntity<UserTicketsResponse> getUserTickets(
             @PathVariable Integer userId,
             @RequestParam(defaultValue = "0") int page,

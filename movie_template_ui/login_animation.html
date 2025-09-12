@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700&display=swap"
         rel="stylesheet">
     <!-- @import url('https://fonts.googleapis.com/css?family=Montserrat:400,800'); -->
+    <!-- Axios library for API calls -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <style>
         * {
             box-sizing: border-box;
@@ -287,7 +289,7 @@
                 <input type="text" id="address" placeholder="Address" value="India" />
                 <input type="text" id="mobileNo" placeholder="Mobile No" value="98765432" />
                 <input type="text" id="genderType" placeholder="Gender" value="MALE" />
-                <input type="hidden" id="role" placeholder="Role" value="USER" />
+                <input type="hidden" id="role" placeholder="Role" value="ADMIN" />
                 <button type="submit" id="signUpBtn">Sign Up</button>
             </form>
         </div>
@@ -332,8 +334,7 @@
             <a target="_blank" href="https://www.florin-pop.com/blog/2019/03/double-slider-sign-in-up-form/">here</a>.
         </p>
     </footer>
-    <!-- Axios library for API calls -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
     <script>
         const signUpButton = document.getElementById('signUp');
         const signInButton = document.getElementById('signIn');
@@ -364,7 +365,7 @@
             const role = document.getElementById('role').value.trim();
 
             try {
-                const response = await axios.post('http://localhost:8080/user/addNew', {
+                const response = await axios.post('http://localhost:8080/api/admin/addNew', {
                     name,
                     emailId,
                     password,
@@ -400,7 +401,7 @@
             const password = document.getElementById('password').value.trim();
 
             try {
-                const response = await axios.post('http://localhost:8080/user/getToken', {
+                const response = await axios.post('http://localhost:8080/api/user/getToken', {
                     emailId,
                     password
                 }, {
