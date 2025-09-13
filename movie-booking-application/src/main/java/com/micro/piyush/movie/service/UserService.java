@@ -10,10 +10,11 @@ import com.micro.piyush.movie.repository.UserRepository;
 import com.micro.piyush.movie.repository.UserRoleRepository;
 import com.micro.piyush.movie.request.UserRequest;
 import com.micro.piyush.movie.response.UserResponse;
-import jakarta.transaction.Transactional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -77,6 +78,7 @@ public class UserService {
         return userRepository.save(newUser);
     }
 
+    @Transactional(readOnly = true)
     public List<UserResponse> getAllUsers() {
         List<UserResponse> responseList = new ArrayList<>();
         List<User> userList = userRepository.findAll();
@@ -88,6 +90,7 @@ public class UserService {
         return responseList;
     }
 
+    @Transactional
     public UserResponse updateUser(UserRequest userUpdateRequest) {
         Optional<User> user = findUser(userUpdateRequest.getEmailId());
         if (!user.isPresent()) {
@@ -98,6 +101,7 @@ public class UserService {
         return UserMapper.userToUserDto(updatedUser);
     }
 
+    @Transactional
     public void deleteUser(Integer id) {
         Optional<User> user = userRepository.findById(id);
         if (user.isPresent()) {

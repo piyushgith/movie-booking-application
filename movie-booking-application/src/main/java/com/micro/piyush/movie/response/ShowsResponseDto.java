@@ -14,6 +14,6 @@ import java.util.Map;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ShowsResponseDTO implements Serializable {
-    private Map<String, List<MovieDTO>> locations;
+public class ShowsResponseDto implements Serializable {
+    private Map<String, List<ShowMovieDto>> locations;
 }

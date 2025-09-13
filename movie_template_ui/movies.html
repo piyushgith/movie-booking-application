@@ -137,7 +137,7 @@
 
             async function loadMovies() {
                 try {
-                    const response = await axios.get('http://localhost:8080/movies/findAllMovies', {
+                    const response = await axios.get('http://localhost:8080/api/movies/all', {
                         headers: { 'Content-Type': 'application/json' }
                     });
                     movies = response.data;

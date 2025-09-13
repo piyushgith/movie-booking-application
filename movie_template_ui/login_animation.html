@@ -289,7 +289,7 @@
                 <input type="text" id="address" placeholder="Address" value="India" />
                 <input type="text" id="mobileNo" placeholder="Mobile No" value="98765432" />
                 <input type="text" id="genderType" placeholder="Gender" value="MALE" />
-                <input type="hidden" id="role" placeholder="Role" value="ADMIN" />
+                <input type="hidden" id="role" placeholder="Role" value="USER" />
                 <button type="submit" id="signUpBtn">Sign Up</button>
             </form>
         </div>
@@ -305,7 +305,7 @@
                 <input type="email" id="emailId" placeholder="Email" value="piyush@gmail.com" />
                 <input type="password" id="password" placeholder="Password" value="prasad" />
                 <!-- get Csrf Token from spring security -->
-                <input type="hidden" id="csrfToken" value="${_csrf.token}" />
+                <!-- <input type="hidden" id="csrfToken" value="${_csrf.token}" /> -->
                 <!-- <a href="#">Forgot your password?</a> -->
                 <button type="submit" id="signInBtn">Sign In</button>
             </form>
@@ -365,7 +365,7 @@
             const role = document.getElementById('role').value.trim();
 
             try {
-                const response = await axios.post('http://localhost:8080/api/admin/addNew', {
+                const response = await axios.post('http://localhost:8080/api/admin/user/register', {
                     name,
                     emailId,
                     password,
@@ -416,9 +416,9 @@
                     sessionStorage.setItem("userId", userId);
                     sessionStorage.setItem("emailId", emailId);
                     // set crsf token in session storage
-                    const csrfToken = document.getElementById('csrfToken').value;
-                    sessionStorage.setItem("XSRF-TOKEN", csrfToken);
-                    console.log("Token stored in sessionStorage:", csrfToken);
+                    // const csrfToken = document.getElementById('csrfToken').value;
+                    // sessionStorage.setItem("XSRF-TOKEN", csrfToken);
+                    // console.log("Token stored in sessionStorage:", csrfToken);
 
                     if (role === "ADMIN") {
                         window.location.href = "/admin/admin-dashboard.html";

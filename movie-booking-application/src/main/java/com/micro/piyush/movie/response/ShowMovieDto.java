@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.io.Serializable;
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,7 +13,7 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class MovieDTO implements Serializable {
+public class ShowMovieDto implements Serializable {
     private int id;
     private String title;
     private String posterUrl;
@@ -26,12 +25,12 @@ public class MovieDTO implements Serializable {
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
-        MovieDTO movieDTO = (MovieDTO) o;
-        return id == movieDTO.id
-                && Objects.equals(title, movieDTO.title)
-                && Objects.equals(posterUrl, movieDTO.posterUrl)
-                && Objects.equals(theatre, movieDTO.theatre)
-                && Objects.equals(timings, movieDTO.timings);
+        ShowMovieDto showMovieDto = (ShowMovieDto) o;
+        return id == showMovieDto.id
+                && Objects.equals(title, showMovieDto.title)
+                && Objects.equals(posterUrl, showMovieDto.posterUrl)
+                && Objects.equals(theatre, showMovieDto.theatre)
+                && Objects.equals(timings, showMovieDto.timings);
     }
 
     @Override

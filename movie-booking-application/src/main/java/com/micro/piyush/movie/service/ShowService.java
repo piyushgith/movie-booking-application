@@ -2,19 +2,12 @@ package com.micro.piyush.movie.service;
 
 import com.micro.piyush.movie.entity.*;
 import com.micro.piyush.movie.enums.LocationType;
-import com.micro.piyush.movie.enums.SeatType;
-import com.micro.piyush.movie.exception.MovieDoesNotExists;
-import com.micro.piyush.movie.exception.ShowDoesNotExists;
-import com.micro.piyush.movie.exception.TheaterDoesNotExists;
-import com.micro.piyush.movie.mapper.ShowMapper;
 import com.micro.piyush.movie.repository.*;
 import com.micro.piyush.movie.request.ShowDto;
-import com.micro.piyush.movie.request.ShowRequest;
 import com.micro.piyush.movie.request.ShowSearchRequest;
-import com.micro.piyush.movie.request.ShowSeatRequest;
-import com.micro.piyush.movie.response.MovieDTO;
+import com.micro.piyush.movie.response.ShowMovieDto;
 import com.micro.piyush.movie.response.ShowResponse;
-import com.micro.piyush.movie.response.ShowsResponseDTO;
+import com.micro.piyush.movie.response.ShowsResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -41,43 +34,43 @@ public class ShowService {
     @Autowired
     private ShowRepository showRepository;
 
-    public ShowsResponseDTO getShowsByMovieId(Integer movieId) {
+    public ShowsResponseDto getShowsByMovieId(Integer movieId) {
         // Fetch all necessary show entities from the database
         List<Show> shows = showRepository.findByMovieId(movieId);
-        Map<String, List<MovieDTO>> locationShowsMap = getShows(shows);
+        Map<String, List<ShowMovieDto>> locationShowsMap = getShows(shows);
         // Finally, create the response DTO
-        return new ShowsResponseDTO(locationShowsMap);
+        return new ShowsResponseDto(locationShowsMap);
     }
 
-    public ShowsResponseDTO getShowsByLocation(String location) {
+    public ShowsResponseDto getShowsByLocation(String location) {
         LocationType locationType = LocationType.fromString(location);
         // Fetch all necessary show entities from the database
         List<Show> shows = showRepository.findShowsByTheaterLocation(locationType);
-        Map<String, List<MovieDTO>> locationShowsMap = getShows(shows);
+        Map<String, List<ShowMovieDto>> locationShowsMap = getShows(shows);
         // Finally, create the response DTO
-        return new ShowsResponseDTO(locationShowsMap);
+        return new ShowsResponseDto(locationShowsMap);
     }
 
-    private static Map<String, List<MovieDTO>> getShows(List<Show> shows) {
+    private static Map<String, List<ShowMovieDto>> getShows(List<Show> shows) {
         // Create a map to hold the DTO data
-        Map<String, List<MovieDTO>> locationShowsMap = new HashMap<>();
+        Map<String, List<ShowMovieDto>> locationShowsMap = new HashMap<>();
 
         // Iterate over the results and populate the DTO
         for (Show show : shows) {
             String location = show.getTheater().getLocation().toString();
 
             // Get or create the Movie DTO list for this theater
-            List<MovieDTO> moviesInTheater = locationShowsMap.getOrDefault(location, new ArrayList<>());
+            List<ShowMovieDto> moviesInTheater = locationShowsMap.getOrDefault(location, new ArrayList<>());
 
             // Check if the movie is already in the list
             boolean movieExists = false;
-            for (MovieDTO movieDto : moviesInTheater) {
-                if (movieDto.getId() == show.getMovie().getId()) {
+            for (ShowMovieDto showMovieDto : moviesInTheater) {
+                if (showMovieDto.getId() == show.getMovie().getId()) {
                     // Add the new showtime to the existing movie
-                    List<String> temp = movieDto.getTimings();
+                    List<String> temp = showMovieDto.getTimings();
                     temp.add(show.getTime().toString());
                     temp = convertAndSortTimes(temp);
-                    movieDto.setTimings(temp);
+                    showMovieDto.setTimings(temp);
                     movieExists = true;
                     break;
                 }
@@ -85,18 +78,18 @@ public class ShowService {
 
             // If the movie doesn't exist, create a new DTO and add it
             if (!movieExists) {
-                MovieDTO movieDto = new MovieDTO();
-                movieDto.setId(show.getMovie().getId());
-                movieDto.setShowId(show.getShowId());
-                movieDto.setTheaterId(show.getTheater().getId());
-                movieDto.setTitle(show.getMovie().getMovieName());
-                movieDto.setPosterUrl("https://placehold.co/400x600/702963/FFFFFF?text=\n+\n"
+                ShowMovieDto showMovieDto = new ShowMovieDto();
+                showMovieDto.setId(show.getMovie().getId());
+                showMovieDto.setShowId(show.getShowId());
+                showMovieDto.setTheaterId(show.getTheater().getId());
+                showMovieDto.setTitle(show.getMovie().getMovieName());
+                showMovieDto.setPosterUrl("https://placehold.co/400x600/702963/FFFFFF?text=\n+\n"
                         + show.getMovie().getMovieName());
-                movieDto.setTheatre(show.getTheater().getName());
+                showMovieDto.setTheatre(show.getTheater().getName());
                 List<String> timings = new ArrayList<>();
                 timings.add(show.getTime().toString());
-                movieDto.setTimings(timings);
-                moviesInTheater.add(movieDto);
+                showMovieDto.setTimings(timings);
+                moviesInTheater.add(showMovieDto);
             }
 
             // Put the updated list back into the map

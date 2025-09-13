@@ -34,6 +34,7 @@
           <li><a href="admin-users.html"
               class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Users</a></li>
           <li><a href="admin-movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
+          <li><a href="admin-theaters.html" class="hover:text-gray-300 transition duration-300">Theaters</a></li>
           <li><a href="admin-shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
         </ul>
       </nav>
@@ -177,30 +178,6 @@
     }
 
 
-
-    // function saveUser() {
-    //   const id = document.getElementById("userId").value;
-    //   const user = {
-    //     name: document.getElementById("name").value,
-    //     age: parseInt(document.getElementById("age").value),
-    //     address: document.getElementById("address").value,
-    //     mobileNo: document.getElementById("mobileNo").value,
-    //     emailId: document.getElementById("email").value,
-    //     genderType: document.getElementById("genderType").value,
-    //     role: document.getElementById("role").value,
-    //     password: document.getElementById("password").value
-    //   };
-    //   let url = "http://localhost:8080/api/admin/user";
-    //   let method = "POST";
-    //   if (id) { url += "/" + id; method = "PUT"; }
-
-    //   fetch(url, {
-    //     method: method,
-    //     headers: { "Content-Type": "application/json" },//, "Authorization": "Bearer " + token
-    //     body: JSON.stringify(user)
-    //   }).then(() => { fetchUsers(); resetForm(); });
-    // }
-
     function editUser(id, name, age, address, mobileNo, emailId, genderType, role) {
       document.getElementById("userId").value = id;
       document.getElementById("name").value = name;
@@ -215,7 +192,7 @@
     function deleteUser(id) {
       fetch("http://localhost:8080/api/admin/user/" + id, {
         method: "DELETE",
-        headers: { "Authorization": "Bearer " + token }
+        headers: {  "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
       }).then(() => fetchUsers());
     }
 

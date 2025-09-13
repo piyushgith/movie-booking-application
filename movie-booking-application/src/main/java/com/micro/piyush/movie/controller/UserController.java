@@ -35,7 +35,7 @@ public class UserController {
     @Autowired
     private JWTService jwtService;
 
-    @PostMapping("/admin/user")
+    @PostMapping("/admin/user/register")
     public ResponseEntity<Object> addNewUser(@RequestBody UserRequest userEntryDto) {
         try {
             User result = userService.addUser(userEntryDto);
