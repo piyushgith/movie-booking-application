@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin - Theater Management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen flex flex-col">
+
+  <!-- Header and Navigation -->
+  <header class="bg-gray-900 text-white shadow-lg w-full">
+    <div class="container mx-auto px-4 py-4 flex flex-col sm:flex-row items-center justify-between">
+      <h1 class="text-3xl font-bold mb-4 sm:mb-0">Cineverse Admin</h1>
+      <button id="logoutBtn"
+        class="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 transform hover:scale-105 mt-4 sm:mt-0">
+        Logout
+      </button>
+    </div>
+    <div class="bg-gray-800 text-white shadow-md w-full">
+      <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
+        <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
+          <li><a href="admin-dashboard.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+          <li><a href="admin-users.html" class="hover:text-gray-300 transition duration-300">Users</a></li>
+          <li><a href="admin-movies.html"
+              class="hover:text-gray-300 transition duration-300">Movies</a></li>
+          <li><a href="admin-theaters.html" class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Theaters</a></li>
+          <li><a href="admin-shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main class="flex-grow p-6 sm:p-10">
+    <div class="max-w-7xl mx-auto space-y-8">
+      <h2 class="text-3xl font-bold text-gray-800">🎬 Theater Management</h2>
+
+      <!-- Create / Update Form -->
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Create / Update Theater</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <input type="hidden" id="theaterId">
+          <input type="text" id="theaterName" placeholder="Theater Name"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <input type="text" id="theaterAddress" placeholder="Theater Address"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <select id="locationType"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white">
+            <option value="">Select Location</option>
+            <!-- Options will be populated by JavaScript -->
+          </select>
+          <button onclick="saveTheater()"
+            class="col-span-1 md:col-span-2 lg:col-span-3 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
+            💾 Save Theater
+          </button>
+        </div>
+      </div>
+
+      <!-- Theaters Table -->
+      <div class="bg-white p-6 rounded-xl shadow-md overflow-x-auto">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">All Theaters</h3>
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-green-600 text-white">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">ID</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Name</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Address</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Location</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="theaterTable" class="bg-white divide-y divide-gray-200">
+            <!-- Theater rows will be dynamically added here -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const token = sessionStorage.getItem("token");
+    if (!token) window.location.href = "/login_animation.html";
+
+    // Enums based on the provided Java code
+    const locations = ["MUMBAI", "CHENNAI", "PUNE", "KOLKATA", "BENGALURU", "DELHI", "AHMEDABAD"];
+
+    // Function to populate the dropdowns
+    function populateDropdowns() {
+      const locationSelect = document.getElementById("locationType");
+      locations.forEach(location => {
+        const option = document.createElement("option");
+        option.value = location;
+        option.textContent = location.replace(/_/g, ' ');
+        locationSelect.appendChild(option);
+      });
+    }
+
+    function fetchTheaters() {
+      fetch("http://localhost:8080/api/theaters/all", {
+        headers: {"Content-Type": "application/json" }
+      })
+        .then(res => res.json())
+        .then(data => {
+          const table = document.getElementById("theaterTable");
+          table.innerHTML = "";
+          data.forEach(t => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.id}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${t.name}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.address}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${t.location}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button onclick="editTheater(${t.id}, '${t.name}', '${t.address}', '${t.location}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
+              <button onclick="deleteTheater(${t.id})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
+            </td>
+          `;
+            table.appendChild(row);
+          });
+        });
+    }
+
+    function saveTheater() {
+      const id = document.getElementById("theaterId").value;
+      const theater = {
+        name: document.getElementById("theaterName").value,
+        address: document.getElementById("theaterAddress").value,
+        location: document.getElementById("locationType").value,
+      };
+
+      if (!theater.name || !theater.address || !theater.location) {
+          // Implement a custom modal or message box here instead of an alert.
+          console.error("Please fill in all the required fields.");
+          return;
+      }
+
+      let url = "http://localhost:8080/api/theaters";
+      let method = "POST";
+      if (id) { url += "/" + id; method = "PUT"; }
+
+      fetch(url, {
+        method: method,
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(theater)
+      }).then(res => {
+        if (res.ok) {
+          fetchTheaters();
+          resetForm();
+        } else {
+          console.error("Failed to save theater:", res.status, res.statusText);
+        }
+      }).catch(error => {
+        console.error("Error saving theater:", error);
+      });
+    }
+
+    function editTheater(id, name, address, location) {
+      document.getElementById("theaterId").value = id;
+      document.getElementById("theaterName").value = name;
+      document.getElementById("theaterAddress").value = address;
+      document.getElementById("locationType").value = location;
+    }
+
+    function deleteTheater(id) {
+      // Implement a custom confirmation modal here.
+      if (confirm("Are you sure you want to delete this theater?")) {
+        fetch("http://localhost:8080/api/theaters/" + id, {
+          method: "DELETE",
+          headers: {  "Content-Type": "application/json" }
+        }).then(res => {
+          if (res.ok) {
+            fetchTheaters();
+          } else {
+            console.error("Failed to delete theater:", res.status, res.statusText);
+          }
+        }).catch(error => {
+          console.error("Error deleting theater:", error);
+        });
+      }
+    }
+
+    function resetForm() {
+      document.getElementById("theaterId").value = "";
+      document.getElementById("theaterName").value = "";
+      document.getElementById("theaterAddress").value = "";
+      document.getElementById("locationType").value = "";
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", () => {
+      sessionStorage.clear(); // Clear all session data
+      localStorage.clear(); // Clear all local storage data
+      window.location.href = "/login_animation.html";
+    });
+
+    populateDropdowns();
+    fetchTheaters();
+  </script>
+</body>
+
+</html>
