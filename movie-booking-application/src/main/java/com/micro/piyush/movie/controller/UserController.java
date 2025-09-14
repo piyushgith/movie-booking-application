@@ -77,8 +77,10 @@ public class UserController {
                         .map(userRole -> userRole.getUserRole())
                         .toArray(String[]::new);
             if (role.length > 0) {
-                return new JWTTokenResponse(jwtService
-                        .generateToken(authRequest.getEmailId()), role[0],user.get().getId(),user.get().getEmailId());
+                return new JWTTokenResponse(jwtService.generateToken(user.get(),role[0]),
+                        role[0],
+                        user.get().getId(),
+                        user.get().getEmailId());
             }
         }
         throw new UsernameNotFoundException("invalid user details.");

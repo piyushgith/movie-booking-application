@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.micro.piyush.movie.entity.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -18,7 +19,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JWTService {
 
-    public static final String SECRET = "404D635166546A576E5A7234753778214125442A472D4B6150645267556B5870";
+    public static final String SECRET = "404D635166546_THIS_SHOULD_BE_32_CHARACTER_LONG_6C756E65416E6541646F7074";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -46,15 +47,23 @@ public class JWTService {
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public String generateToken(String userName) {
+    public String generateToken(User user,String role) {
         Map<String, Object> claims = new HashMap<>();
+        String userName = user.getName();
+        claims.put("role", role);
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmailId());
         return createToken(claims, userName);
     }
 
     private String createToken(Map<String, Object> claims, String userName) {
-        return Jwts.builder().setClaims(claims).setSubject(userName).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30))
-                .signWith(getSignKey(), SignatureAlgorithm.HS256).compact();
+        return Jwts.builder()
+                .setClaims(claims)  // 1. Add extra information (payload data)
+                .setSubject(userName) // 2. Set the subject (who the token belongs to, usually the username)
+                .setIssuedAt(new Date(System.currentTimeMillis())) // 3. When the token was created
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 30)) // 4. Expiry time (30 minutes here)
+                .signWith(getSignKey(), SignatureAlgorithm.HS256) // 5. Sign the token with secret key + HS256 algorithm
+                .compact(); // 6. Build and return the JWT as a String
     }
 
     private Key getSignKey() {

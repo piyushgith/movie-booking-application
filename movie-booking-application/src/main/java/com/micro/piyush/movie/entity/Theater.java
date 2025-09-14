@@ -25,7 +25,6 @@ public class Theater {
     private String address;
 
     @Column(name = "location", nullable = false)
-    @NotBlank(message = "Location is required")
     @Enumerated(EnumType.STRING)
     private LocationType location;
 

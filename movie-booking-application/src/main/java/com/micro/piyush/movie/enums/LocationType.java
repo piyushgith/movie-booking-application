@@ -3,11 +3,14 @@ package com.micro.piyush.movie.enums;
 import java.util.Arrays;
 
 public enum LocationType {
+    AHMEDABAD("Ahmedabad"),
     BANGALORE("Bangalore"),
     CHENNAI("Chennai"),
     DELHI("Delhi"),
+    HYDERABAD("Hyderabad"),
+    KOLKATA("Kolkata"),
     MUMBAI("Mumbai"),
-    HYDERABAD("Hyderabad");
+    PUNE("Pune");
 
     private final String displayName;
 

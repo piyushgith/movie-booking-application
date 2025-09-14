@@ -20,7 +20,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/theaters")
 @CrossOrigin(origins = "*")
-@Validated
+//@Validated
 public class TheaterController {
 
     @Autowired

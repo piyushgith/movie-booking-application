@@ -35,7 +35,7 @@ public class TheaterService {
 
         Theater theater = Theater.builder()
                 .address(request.getAddress())
-                .location(request.getLocation())
+                .location(LocationType.fromString(request.getLocation()))
                 .name(request.getName())
                 .build();
 
