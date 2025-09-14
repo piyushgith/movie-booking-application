@@ -1,19 +1,13 @@
 package com.micro.piyush.movie.service;
 
 import com.micro.piyush.movie.entity.*;
-import com.micro.piyush.movie.exception.SeatsNotAvailable;
-import com.micro.piyush.movie.exception.ShowDoesNotExists;
-import com.micro.piyush.movie.exception.UserDoesNotExists;
-import com.micro.piyush.movie.mapper.TicketMapper;
 import com.micro.piyush.movie.repository.ShowRepository;
 import com.micro.piyush.movie.repository.ShowSeatRepository;
 import com.micro.piyush.movie.repository.TicketRepository;
 import com.micro.piyush.movie.repository.UserRepository;
 import com.micro.piyush.movie.request.BookTicketRequest;
-import com.micro.piyush.movie.request.TicketRequest;
 import com.micro.piyush.movie.request.UserTicketDto;
 import com.micro.piyush.movie.response.BookTicketResponse;
-import com.micro.piyush.movie.response.TicketResponse;
 import com.micro.piyush.movie.response.UserTicketsResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
