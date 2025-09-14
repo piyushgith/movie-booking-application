@@ -5,6 +5,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin - User Management</title>
+  <script src="../config.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -107,10 +108,10 @@
 
   <script>
     const token = sessionStorage.getItem("token");
-    if (!token) window.location.href = "/login_animation.html";
+    if (!token) window.location.href = "/user/login_animation.html";
 
     function fetchUsers() {
-      fetch("http://localhost:8080/api/admin/user/all", {
+      fetch(CONFIG.API_URL + "/admin/user/all", {
         headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
       })
         .then(res => res.json())
@@ -156,7 +157,7 @@
         password: document.getElementById("password").value
       };
 
-      let url = "http://localhost:8080/api/admin/user";
+      let url = CONFIG.API_URL + "/admin/user";
       let method = "POST";
 
       // Check if a userId exists to determine if it's a PUT or POST call
@@ -190,9 +191,9 @@
     }
 
     function deleteUser(id) {
-      fetch("http://localhost:8080/api/admin/user/" + id, {
+      fetch(CONFIG.API_URL + "/admin/user/" + id, {
         method: "DELETE",
-        headers: {  "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
       }).then(() => fetchUsers());
     }
 
@@ -211,7 +212,7 @@
     document.getElementById("logoutBtn").addEventListener("click", () => {
       sessionStorage.clear(); // Clear all session data
       localStorage.clear(); // Clear all local storage data
-      window.location.href = "/login_animation.html";
+      window.location.href = "/user/login_animation.html";
     });
 
     fetchUsers();

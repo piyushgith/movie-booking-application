@@ -1,12 +1,10 @@
 package com.micro.piyush.movie.controller;
 
 
-import com.micro.piyush.movie.entity.Movie;
 import com.micro.piyush.movie.enums.GenreType;
 import com.micro.piyush.movie.enums.LanguageType;
 import com.micro.piyush.movie.request.CreateMovieRequest;
 import com.micro.piyush.movie.request.MovieDto;
-import com.micro.piyush.movie.request.MovieRequest;
 import com.micro.piyush.movie.request.UpdateMovieRequest;
 import com.micro.piyush.movie.response.MovieResponse;
 import com.micro.piyush.movie.service.MovieService;

@@ -19,7 +19,7 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/shows")
+@RequestMapping("/api/shows")
 @CrossOrigin(origins = "*")
 public class ShowController {
 

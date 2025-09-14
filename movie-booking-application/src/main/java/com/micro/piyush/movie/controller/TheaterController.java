@@ -1,7 +1,9 @@
 package com.micro.piyush.movie.controller;
 
 import com.micro.piyush.movie.enums.LocationType;
-import com.micro.piyush.movie.request.*;
+import com.micro.piyush.movie.request.CreateTheaterRequest;
+import com.micro.piyush.movie.request.TheaterDto;
+import com.micro.piyush.movie.request.UpdateTheaterRequest;
 import com.micro.piyush.movie.response.TheaterResponse;
 import com.micro.piyush.movie.service.TheaterService;
 import jakarta.validation.Valid;
@@ -11,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

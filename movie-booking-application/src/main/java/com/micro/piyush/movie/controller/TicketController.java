@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 @RestController
-@RequestMapping("/tickets")
+@RequestMapping("/api/tickets")
 @CrossOrigin(origins = "*")
 public class TicketController {
 

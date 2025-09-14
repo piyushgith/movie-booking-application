@@ -19,7 +19,7 @@ import io.jsonwebtoken.security.Keys;
 @Service
 public class JWTService {
 
-    public static final String SECRET = "404D635166546_THIS_SHOULD_BE_32_CHARACTER_LONG_6C756E65416E6541646F7074";
+    public static final String SECRET = "404D635166546THISSHOULDBE32CHARACTERLONG6C756E65416E6541646F7074";
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);

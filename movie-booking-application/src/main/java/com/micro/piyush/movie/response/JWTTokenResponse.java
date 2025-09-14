@@ -14,7 +14,4 @@ public class JWTTokenResponse {
     private String role;
     private Integer userId;
     private String emailId;
-
-    public static class ShowResponse {
-    }
 }

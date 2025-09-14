@@ -40,7 +40,7 @@ public class SecurityConfiguration {
 //                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 //                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
-                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/theaters/**","/api/movies/**","/api/user/**","/api/admin/**","/tickets/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"))
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/shows/**","/api/theaters/**","/api/movies/**","/api/user/**","/api/admin/**","/api/tickets/**", "/h2-console/**", "/swagger-ui/**", "/v3/api-docs/**"))
                 .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
                 .authorizeHttpRequests(req -> req
                         .anyRequest().permitAll() // Allow all requests without authentication
