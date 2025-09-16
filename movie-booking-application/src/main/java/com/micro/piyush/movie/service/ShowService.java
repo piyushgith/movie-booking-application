@@ -165,7 +165,7 @@ public class ShowService {
     // READ ALL with details
     public List<ShowDto> getAllShowsWithDetails() {
         List<Show> shows = showRepository.findAllShowsWithDetails();
-        return shows.stream().map(this::convertToShowDto).collect(Collectors.toList());
+        return shows.stream().map(s->convertToShowDto(s,false)).collect(Collectors.toList());
     }
 
     // READ BY ID with details and seats
@@ -174,7 +174,7 @@ public class ShowService {
         if (show == null) {
             throw new RuntimeException("Show not found");
         }
-        return convertToShowDto(show);
+        return convertToShowDto(show,false);
     }
 
     // UPDATE
@@ -206,28 +206,30 @@ public class ShowService {
     // Get shows by movie
     public List<ShowDto> getShowDtoByMovieId(Integer movieId) {
         List<Show> shows = showRepository.findByMovieId(movieId);
-        return shows.stream().map(this::convertToShowDto).collect(Collectors.toList());
+        return shows.stream().map(s->convertToShowDto(s,false)).collect(Collectors.toList());
     }
 
     // Get shows by theater
     public List<ShowDto> getShowsByTheaterId(Integer theaterId) {
         List<Show> shows = showRepository.findByTheaterId(theaterId);
-        return shows.stream().map(this::convertToShowDto).collect(Collectors.toList());
+        return shows.stream().map(s->convertToShowDto(s,false)).collect(Collectors.toList());
     }
 
     // Helper method to convert Show to ShowDto
-    private ShowDto convertToShowDto(Show show) {
+    private ShowDto convertToShowDto(Show show,boolean includeSeats) {
         ShowDto dto = new ShowDto();
         dto.setShowId(show.getShowId());
         dto.setDate(show.getDate());
         dto.setTime(show.getTime());
+        dto.setMovieId(show.getMovie() != null ? show.getMovie().getId() : null);
+        dto.setTheaterId(show.getTheater() != null ? show.getTheater().getId() : null);
         dto.setMovieName(show.getMovie() != null ? show.getMovie().getMovieName() : null);
         dto.setTheaterName(show.getTheater() != null ? show.getTheater().getName() : null);
         dto.setTheaterLocation(show.getTheater() != null ? show.getTheater().getLocation().name() : null);
         dto.setDuration(show.getMovie() != null ? show.getMovie().getDuration() : null);
 
         // Convert show seats
-        if (show.getShowSeats() != null) {
+        if (show.getShowSeats() != null && includeSeats) {
             List<ShowSeatDto> seatDtos = show.getShowSeats().stream()
                     .map(seat -> new ShowSeatDto(
                             seat.getId(),

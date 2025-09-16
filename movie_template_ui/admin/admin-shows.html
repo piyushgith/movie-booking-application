@@ -151,12 +151,12 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.showId}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${s.movieName}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.theaterName}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${time}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.date}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.time}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${s.theaterLocation}</td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button onclick="editShow(${s.id}, ${s.movie.id}, ${s.theater.id}, '${s.date}', '${s.time}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
-              <button onclick="deleteShow(${s.id})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
+              <button onclick="editShow(${s.showId}, ${s.movieId}, ${s.theaterId}, '${s.date}', '${s.time}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
+              <button onclick="deleteShow(${s.showId})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
             </td>
           `;
             table.appendChild(row);

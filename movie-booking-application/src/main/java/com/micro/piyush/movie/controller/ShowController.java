@@ -52,7 +52,7 @@ public class ShowController {
         return new ResponseEntity<>(show, HttpStatus.CREATED);
     }
 
-    @GetMapping
+    @GetMapping("/all")
     public ResponseEntity<List<ShowDto>> getAllShows() {
         List<ShowDto> shows = showService.getAllShowsWithDetails();
         return new ResponseEntity<>(shows, HttpStatus.OK);

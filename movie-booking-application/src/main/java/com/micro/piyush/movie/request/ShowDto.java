@@ -15,6 +15,7 @@ import java.util.List;
 @AllArgsConstructor
 public class ShowDto {
     private Integer showId;
+    private Integer movieId;
     private Integer theaterId;
     private LocalDate date;
     private LocalTime time;
@@ -29,6 +30,7 @@ public class ShowDto {
         this.showId = show.getShowId();
         this.date = show.getDate();
         this.time = show.getTime();
+        this.movieId = show.getMovie() != null ? show.getMovie().getId() : null;
         this.movieName = show.getMovie() != null ? show.getMovie().getMovieName() : null;
         this.theaterId = show.getTheater() != null ? show.getTheater().getId() : null;
         this.theaterName = show.getTheater() != null ? show.getTheater().getName() : null;
