@@ -14,6 +14,11 @@
     body {
       font-family: 'Inter', sans-serif;
     }
+
+    .sortable-header {
+      cursor: pointer;
+      user-select: none;
+    }
   </style>
 </head>
 
@@ -59,12 +64,41 @@
             class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
           <input type="time" id="showTime" step="900"
             class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <!-- <input type="number" id="price" placeholder="Ticket Price" step="50" min="0"
-            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"> -->
           <button onclick="saveShow()"
             class="col-span-1 md:col-span-2 lg:col-span-3 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
             💾 Save Show
           </button>
+        </div>
+      </div>
+
+      <!-- Filter Section -->
+      <div class="bg-white p-6 rounded-xl shadow-md">
+        <h3 class="text-xl font-semibold text-gray-800 mb-4">Filter Shows</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <select id="filterMovie"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Movies</option>
+          </select>
+          <select id="filterTheater"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Theaters</option>
+          </select>
+          <select id="filterLocation"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="">All Locations</option>
+          </select>
+          <input type="date" id="filterDate"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <div class="col-span-1 md:col-span-2 lg:col-span-4 flex space-x-2">
+            <button onclick="applyFilters()"
+              class="flex-1 py-3 px-6 bg-green-600 text-white font-semibold rounded-lg hover:bg-green-700 transition-colors duration-200">
+              🔍 Apply Filter
+            </button>
+            <button onclick="clearFilters()"
+              class="flex-1 py-3 px-6 bg-gray-500 text-white font-semibold rounded-lg hover:bg-gray-600 transition-colors duration-200">
+              Clear Filters
+            </button>
+          </div>
         </div>
       </div>
 
@@ -75,11 +109,23 @@
           <thead class="bg-yellow-500 text-white">
             <tr>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">ID</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Movie</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Theater</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Date</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium sortable-header"
+                onclick="sortShows('movieName')">
+                Movie <span id="sort-movieName"></span>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium sortable-header"
+                onclick="sortShows('theaterName')">
+                Theater <span id="sort-theaterName"></span>
+              </th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium sortable-header"
+                onclick="sortShows('date')">
+                Date <span id="sort-date"></span>
+              </th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Time</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Location</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium sortable-header"
+                onclick="sortShows('theaterLocation')">
+                Location <span id="sort-theaterLocation"></span>
+              </th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Actions</th>
             </tr>
           </thead>
@@ -95,9 +141,16 @@
     const token = sessionStorage.getItem("token");
     if (!token) window.location.href = "/user/login_animation.html";
 
+    // Global variable to store all shows to avoid repeated API calls
+    let allShows = [];
+    let currentSortColumn = null;
+    let currentSortDirection = 'asc';
+
     function loadMovies() {
       fetch(CONFIG.API_URL + "/movies/all", {
-        headers: { "Content-Type": "application/json" }//,"Authorization": "Bearer " + token
+        headers: {
+          "Content-Type": "application/json"
+        }
       })
         .then(res => {
           if (!res.ok) throw new Error("Failed to load movies");
@@ -105,7 +158,7 @@
         })
         .then(movies => {
           const ddl = document.getElementById("movieId");
-          ddl.innerHTML = "<option value=\"\">Select Movie</option>"; // Added placeholder
+          ddl.innerHTML = "<option value=\"\">Select Movie</option>";
           movies.forEach(m => {
             ddl.innerHTML += `<option value="${m.id}">${m.movieName}</option>`;
           });
@@ -115,7 +168,9 @@
 
     function loadTheaters() {
       fetch(CONFIG.API_URL + "/theaters/all", {
-        headers: { "Content-Type": "application/json" }// "Authorization": "Bearer " + token
+        headers: {
+          "Content-Type": "application/json"
+        }
       })
         .then(res => {
           if (!res.ok) throw new Error("Failed to load theaters");
@@ -123,7 +178,7 @@
         })
         .then(theaters => {
           const ddl = document.getElementById("theaterId");
-          ddl.innerHTML = "<option value=\"\">Select Theater</option>"; // Added placeholder
+          ddl.innerHTML = "<option value=\"\">Select Theater</option>";
           theaters.forEach(t => {
             ddl.innerHTML += `<option value="${t.id}">${t.name}</option>`;
           });
@@ -131,39 +186,148 @@
         .catch(error => console.error("Error loading theaters:", error));
     }
 
-
-    function fetchShows() {
+    function fetchAndRenderShows() {
       fetch(CONFIG.API_URL + "/shows/all", {
-        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+        headers: {
+          "Content-Type": "application/json"
+        }
       })
         .then(res => {
           if (!res.ok) throw new Error("Failed to fetch shows");
           return res.json();
         })
         .then(data => {
-          const table = document.getElementById("showTable");
-          table.innerHTML = "";
-          data.forEach(s => {
-            const date = new Date(s.date).toLocaleDateString();
-            const time = new Date(`1970-01-01T${s.time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            const row = document.createElement("tr");
-            row.innerHTML = `
+          allShows = data;
+          populateFilterDropdowns();
+          renderShows(allShows);
+        })
+        .catch(error => console.error("Error fetching shows:", error));
+    }
+
+    function populateFilterDropdowns() {
+      const movieFilter = document.getElementById("filterMovie");
+      const theaterFilter = document.getElementById("filterTheater");
+      const locationFilter = document.getElementById("filterLocation");
+
+      const uniqueMovies = [...new Set(allShows.map(show => show.movieName))].sort();
+      const uniqueTheaters = [...new Set(allShows.map(show => show.theaterName))].sort();
+      const uniqueLocations = [...new Set(allShows.map(show => show.theaterLocation))].sort();
+
+      movieFilter.innerHTML = "<option value=\"\">All Movies</option>";
+      uniqueMovies.forEach(movie => {
+        movieFilter.innerHTML += `<option value="${movie}">${movie}</option>`;
+      });
+
+      theaterFilter.innerHTML = "<option value=\"\">All Theaters</option>";
+      uniqueTheaters.forEach(theater => {
+        theaterFilter.innerHTML += `<option value="${theater}">${theater}</option>`;
+      });
+
+      locationFilter.innerHTML = "<option value=\"\">All Locations</option>";
+      uniqueLocations.forEach(location => {
+        locationFilter.innerHTML += `<option value="${location}">${location}</option>`;
+      });
+    }
+
+    function renderShows(showsToRender) {
+      const table = document.getElementById("showTable");
+      table.innerHTML = "";
+
+      // Clear existing sort indicators
+      document.querySelectorAll('.sortable-header span').forEach(span => {
+        span.textContent = '';
+      });
+
+      // Add new sort indicator if a column is sorted
+      if (currentSortColumn) {
+        const arrow = currentSortDirection === 'asc' ? '▲' : '▼';
+        document.getElementById(`sort-${currentSortColumn}`).textContent = ` ${arrow}`;
+      }
+
+      showsToRender.forEach(s => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.showId}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${s.movieName}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.theaterName}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.date}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.time}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${s.theaterLocation}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.theaterLocation}</td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
               <button onclick="editShow(${s.showId}, ${s.movieId}, ${s.theaterId}, '${s.date}', '${s.time}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
               <button onclick="deleteShow(${s.showId})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
             </td>
           `;
-            table.appendChild(row);
-          });
-        })
-        .catch(error => console.error("Error fetching shows:", error));
+        table.appendChild(row);
+      });
     }
+
+    function sortShows(column) {
+      if (currentSortColumn === column) {
+        currentSortDirection = currentSortDirection === 'asc' ? 'desc' : 'asc';
+      } else {
+        currentSortColumn = column;
+        currentSortDirection = 'asc';
+      }
+
+      // Filtered shows from the current table view
+      const displayedShows = Array.from(document.getElementById("showTable").rows).map(row => {
+        const showId = row.cells[0].textContent;
+        return allShows.find(show => show.showId == showId);
+      });
+
+      displayedShows.sort((a, b) => {
+        const aValue = a[column];
+        const bValue = b[column];
+
+        let comparison = 0;
+        if (typeof aValue === 'string' && typeof bValue === 'string') {
+          comparison = aValue.localeCompare(bValue);
+        } else {
+          comparison = aValue > bValue ? 1 : bValue > aValue ? -1 : 0;
+        }
+
+        return currentSortDirection === 'asc' ? comparison : -comparison;
+      });
+
+      renderShows(displayedShows);
+    }
+
+    function applyFilters() {
+      const movieFilter = document.getElementById("filterMovie").value;
+      const theaterFilter = document.getElementById("filterTheater").value;
+      const locationFilter = document.getElementById("filterLocation").value;
+      const dateFilter = document.getElementById("filterDate").value;
+
+      const filteredShows = allShows.filter(show => {
+        const matchesMovie = !movieFilter || show.movieName === movieFilter;
+        const matchesTheater = !theaterFilter || show.theaterName === theaterFilter;
+        const matchesLocation = !locationFilter || show.theaterLocation === locationFilter;
+        const matchesDate = !dateFilter || show.date === dateFilter;
+
+        return matchesMovie && matchesTheater && matchesLocation && matchesDate;
+      });
+
+      // Clear any previous sort state when applying a new filter
+      currentSortColumn = null;
+      currentSortDirection = 'asc';
+
+      renderShows(filteredShows);
+    }
+
+    function clearFilters() {
+      document.getElementById("filterMovie").value = "";
+      document.getElementById("filterTheater").value = "";
+      document.getElementById("filterLocation").value = "";
+      document.getElementById("filterDate").value = "";
+
+      // Clear sort state
+      currentSortColumn = null;
+      currentSortDirection = 'asc';
+
+      renderShows(allShows);
+    }
+
 
     function saveShow() {
       const id = document.getElementById("showId").value;
@@ -171,8 +335,7 @@
         movieId: document.getElementById("movieId").value,
         theaterId: document.getElementById("theaterId").value,
         date: document.getElementById("showDate").value,
-        time: document.getElementById("showTime").value,
-        price: document.getElementById("price").value
+        time: document.getElementById("showTime").value
       };
 
       if (!show.movieId || !show.theaterId || !show.date || !show.time) {
@@ -180,12 +343,19 @@
         return;
       }
 
-      let url = CONFIG.API_URL + "/admin/shows";
+      let url = CONFIG.API_URL + "/shows";
       let method = "POST";
       if (id) {
         url += "/" + id;
         method = "PUT";
       }
+
+      // Step 1: Log the request details before sending
+      console.log('--- Request Details ---');
+      console.log('URL:', url);
+      console.log('Method:', method);
+      console.log('Body:', JSON.stringify(show));
+      console.log('-----------------------');
 
       fetch(url, {
         method: method,
@@ -194,33 +364,66 @@
           //,"Authorization": "Bearer " + token
         },
         body: JSON.stringify(show)
-      }).then(res => {
-        if (!res.ok) throw new Error("Failed to save show");
-        return res.json();
-      }).then(() => {
-        fetchShows();
-        resetForm();
-      }).catch(error => console.error("Error saving show:", error));
+      })
+        .then(res => {
+          // Step 2: Log the raw response object
+          console.log('--- Response Received ---');
+          console.log('Response status:', res.status);
+          console.log('Response is OK:', res.ok);
+          console.log('-------------------------');
+
+          if (!res.ok) {
+            // Step 3: Log a specific error message if the response is not OK
+            console.error("Fetch failed with status:", res.status, res.statusText);
+            throw new Error("Failed to save show");
+          }
+
+          // Step 4: Log the JSON data before parsing
+          return res.json().then(data => {
+            console.log('--- JSON Data ---');
+            console.log('Parsed JSON data:', data);
+            console.log('-----------------');
+            return data;
+          });
+        })
+        .then(() => {
+          // Step 5: Log when the main actions are triggered
+          console.log('Success! Fetching shows and resetting form...');
+          fetchShows();
+          resetForm();
+        })
+        .catch(error => {
+          // Step 6: Log the final error
+          console.error("--- Final Error Caught ---");
+          console.error("Error saving show:", error);
+          console.error("--------------------------");
+          alert("An error occurred while saving the show. Please check the console for details.");
+        });
+
     }
 
-    function editShow(id, movieId, theaterId, date, time, price) {
+    function editShow(id, movieId, theaterId, date, time) {
       document.getElementById("showId").value = id;
       document.getElementById("movieId").value = movieId;
       document.getElementById("theaterId").value = theaterId;
       document.getElementById("showDate").value = date;
-      document.getElementById("showTime").value = time.substring(0, 5); // Time is stored as HH:mm:ss, but input is HH:mm
-      //document.getElementById("price").value = price;
+      document.getElementById("showTime").value = time.substring(0, 5);
     }
 
     function deleteShow(id) {
-      console.log('Are you sure you want to delete this show?');
+      if (!confirm('Are you sure you want to delete this show?')) {
+        return;
+      }
       fetch(CONFIG.API_URL + "/shows/" + id, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+        headers: {
+          "Content-Type": "application/json"
+        },
       }).then(res => {
         if (!res.ok) throw new Error("Failed to delete show");
-        fetchShows();
-      }).catch(error => console.error("Error deleting show:", error));
+        fetchAndRenderShows();
+      })
+        .catch(error => console.error("Error deleting show:", error));
     }
 
     function resetForm() {
@@ -229,18 +432,18 @@
       document.getElementById("theaterId").value = "";
       document.getElementById("showDate").value = "";
       document.getElementById("showTime").value = "";
-      document.getElementById("price").value = "";
     }
 
     document.getElementById("logoutBtn").addEventListener("click", () => {
-      sessionStorage.clear(); // Clear all session data
-      localStorage.clear(); // Clear all local storage data
+      sessionStorage.clear();
+      localStorage.clear();
       window.location.href = "/user/login_animation.html";
     });
 
-    //loadMovies();
-    //loadTheaters();
-    fetchShows();
+    loadMovies();
+    loadTheaters();
+    fetchAndRenderShows();
   </script>
 </body>
+
 </html>

@@ -1,30 +1,31 @@
 package com.micro.piyush.movie.service;
 
-import com.micro.piyush.movie.entity.*;
+import com.micro.piyush.movie.entity.Movie;
+import com.micro.piyush.movie.entity.Show;
+import com.micro.piyush.movie.entity.Theater;
 import com.micro.piyush.movie.enums.LocationType;
-import com.micro.piyush.movie.enums.SeatType;
-import com.micro.piyush.movie.repository.*;
+import com.micro.piyush.movie.repository.MovieRepository;
+import com.micro.piyush.movie.repository.ShowRepository;
+import com.micro.piyush.movie.repository.ShowSeatRepository;
+import com.micro.piyush.movie.repository.TheaterRepository;
 import com.micro.piyush.movie.request.ShowDto;
-import com.micro.piyush.movie.request.ShowSearchRequest;
 import com.micro.piyush.movie.request.ShowSeatDto;
 import com.micro.piyush.movie.response.ShowMovieDto;
-import com.micro.piyush.movie.response.ShowResponse;
 import com.micro.piyush.movie.response.ShowsResponseDto;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-@Transactional(readOnly = true)
 public class ShowService {
 
     @Autowired
@@ -39,7 +40,7 @@ public class ShowService {
     @Autowired
     private ShowSeatRepository showSeatRepository;
 
-
+    @Transactional(readOnly = true)
     public ShowsResponseDto getShowsByMovieId(Integer movieId) {
         // Fetch all necessary show entities from the database
         List<Show> shows = showRepository.findByMovieId(movieId);
@@ -48,6 +49,7 @@ public class ShowService {
         return new ShowsResponseDto(locationShowsMap);
     }
 
+    @Transactional(readOnly = true)
     public ShowsResponseDto getShowsByLocation(String location) {
         LocationType locationType = LocationType.fromString(location);
         // Fetch all necessary show entities from the database
@@ -146,8 +148,10 @@ public class ShowService {
 
 
     // CREATE
+    @Transactional
     public Show createShow(ShowDto showDto) {
-        Movie movie = movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())
+        
+        Movie movie = movieRepository.findById(showDto.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         Theater theater = theaterRepository.findById(showDto.getTheaterId())
@@ -163,12 +167,14 @@ public class ShowService {
     }
 
     // READ ALL with details
+    @Transactional(readOnly = true)
     public List<ShowDto> getAllShowsWithDetails() {
         List<Show> shows = showRepository.findAllShowsWithDetails();
         return shows.stream().map(s->convertToShowDto(s,false)).collect(Collectors.toList());
     }
 
     // READ BY ID with details and seats
+    @Transactional(readOnly = true)
     public ShowDto getShowWithDetails(Integer id) {
         Show show = showRepository.findShowWithDetails(id);
         if (show == null) {
@@ -178,11 +184,12 @@ public class ShowService {
     }
 
     // UPDATE
+    @Transactional
     public Show updateShow(Integer id, ShowDto showDto) {
         Show show = showRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Show not found"));
 
-        Movie movie = movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())
+        Movie movie = movieRepository.findById(showDto.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
 
         Theater theater = theaterRepository.findById(showDto.getTheaterId())
@@ -197,6 +204,7 @@ public class ShowService {
     }
 
     // DELETE
+    @Transactional
     public void deleteShow(Integer id) {
         Show show = showRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Show not found"));
@@ -204,12 +212,14 @@ public class ShowService {
     }
 
     // Get shows by movie
+    @Transactional(readOnly = true)
     public List<ShowDto> getShowDtoByMovieId(Integer movieId) {
         List<Show> shows = showRepository.findByMovieId(movieId);
         return shows.stream().map(s->convertToShowDto(s,false)).collect(Collectors.toList());
     }
 
     // Get shows by theater
+    @Transactional(readOnly = true)
     public List<ShowDto> getShowsByTheaterId(Integer theaterId) {
         List<Show> shows = showRepository.findByTheaterId(theaterId);
         return shows.stream().map(s->convertToShowDto(s,false)).collect(Collectors.toList());
@@ -242,7 +252,6 @@ public class ShowService {
                     )).collect(Collectors.toList());
             dto.setShowSeats(seatDtos);
         }
-
         return dto;
     }
 }
