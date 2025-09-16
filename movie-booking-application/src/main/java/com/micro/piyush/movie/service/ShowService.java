@@ -2,9 +2,11 @@ package com.micro.piyush.movie.service;
 
 import com.micro.piyush.movie.entity.*;
 import com.micro.piyush.movie.enums.LocationType;
+import com.micro.piyush.movie.enums.SeatType;
 import com.micro.piyush.movie.repository.*;
 import com.micro.piyush.movie.request.ShowDto;
 import com.micro.piyush.movie.request.ShowSearchRequest;
+import com.micro.piyush.movie.request.ShowSeatDto;
 import com.micro.piyush.movie.response.ShowMovieDto;
 import com.micro.piyush.movie.response.ShowResponse;
 import com.micro.piyush.movie.response.ShowsResponseDto;
@@ -33,6 +35,10 @@ public class ShowService {
 
     @Autowired
     private ShowRepository showRepository;
+
+    @Autowired
+    private ShowSeatRepository showSeatRepository;
+
 
     public ShowsResponseDto getShowsByMovieId(Integer movieId) {
         // Fetch all necessary show entities from the database
@@ -139,84 +145,102 @@ public class ShowService {
 
 
 
+    // CREATE
+    public Show createShow(ShowDto showDto) {
+        Movie movie = movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
 
-    public List<ShowDto> getAllShows() {
-        List<Show> shows = showRepository.findAll();
-        return shows.stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
+        Theater theater = theaterRepository.findById(showDto.getTheaterId())
+                .orElseThrow(() -> new RuntimeException("Theater not found"));
+
+        Show show = new Show();
+        show.setDate(showDto.getDate());
+        show.setTime(showDto.getTime());
+        show.setMovie(movie);
+        show.setTheater(theater);
+
+        return showRepository.save(show);
     }
 
-    public ShowResponse getAllShows(Pageable pageable) {
-        Page<Show> showPage = showRepository.findAll(pageable);
-        List<ShowDto> showDtos = showPage.getContent().stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
-
-        return new ShowResponse(
-                showDtos,
-                showPage.getTotalElements(),
-                showPage.getTotalPages(),
-                showPage.getNumber(),
-                showPage.getSize()
-        );
+    // READ ALL with details
+    public List<ShowDto> getAllShowsWithDetails() {
+        List<Show> shows = showRepository.findAllShowsWithDetails();
+        return shows.stream().map(this::convertToShowDto).collect(Collectors.toList());
     }
 
-    public List<ShowDto> getUpcomingShows() {
-        List<Show> shows = showRepository.findUpcomingShows();
-        return shows.stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
+    // READ BY ID with details and seats
+    public ShowDto getShowWithDetails(Integer id) {
+        Show show = showRepository.findShowWithDetails(id);
+        if (show == null) {
+            throw new RuntimeException("Show not found");
+        }
+        return convertToShowDto(show);
     }
 
-/*    public List<ShowDto> getShowsByMovieId(Integer movieId) {
+    // UPDATE
+    public Show updateShow(Integer id, ShowDto showDto) {
+        Show show = showRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Show not found"));
+
+        Movie movie = movieRepository.findByMovieNameIgnoreCase(showDto.getMovieName())
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+
+        Theater theater = theaterRepository.findById(showDto.getTheaterId())
+                .orElseThrow(() -> new RuntimeException("Theater not found"));
+
+        show.setDate(showDto.getDate());
+        show.setTime(showDto.getTime());
+        show.setMovie(movie);
+        show.setTheater(theater);
+
+        return showRepository.save(show);
+    }
+
+    // DELETE
+    public void deleteShow(Integer id) {
+        Show show = showRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Show not found"));
+        showRepository.delete(show);
+    }
+
+    // Get shows by movie
+    public List<ShowDto> getShowDtoByMovieId(Integer movieId) {
         List<Show> shows = showRepository.findByMovieId(movieId);
-        return shows.stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
-    }*/
+        return shows.stream().map(this::convertToShowDto).collect(Collectors.toList());
+    }
 
+    // Get shows by theater
     public List<ShowDto> getShowsByTheaterId(Integer theaterId) {
         List<Show> shows = showRepository.findByTheaterId(theaterId);
-        return shows.stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
+        return shows.stream().map(this::convertToShowDto).collect(Collectors.toList());
     }
 
-    public List<ShowDto> getShowsByDate(LocalDate date) {
-        List<Show> shows = showRepository.findByDate(date);
-        return shows.stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
-    }
+    // Helper method to convert Show to ShowDto
+    private ShowDto convertToShowDto(Show show) {
+        ShowDto dto = new ShowDto();
+        dto.setShowId(show.getShowId());
+        dto.setDate(show.getDate());
+        dto.setTime(show.getTime());
+        dto.setMovieName(show.getMovie() != null ? show.getMovie().getMovieName() : null);
+        dto.setTheaterName(show.getTheater() != null ? show.getTheater().getName() : null);
+        dto.setTheaterLocation(show.getTheater() != null ? show.getTheater().getLocation().name() : null);
+        dto.setDuration(show.getMovie() != null ? show.getMovie().getDuration() : null);
 
-    public ShowResponse searchShows(ShowSearchRequest request, Pageable pageable) {
-        Page<Show> showPage = showRepository.searchShows(
-                request.getMovieId(),
-                request.getTheaterId(),
-                request.getDate(),
-                request.getMovieName(),
-                request.getTheaterName(),
-                request.getLocation(),
-                pageable
-        );
+        // Convert show seats
+        if (show.getShowSeats() != null) {
+            List<ShowSeatDto> seatDtos = show.getShowSeats().stream()
+                    .map(seat -> new ShowSeatDto(
+                            seat.getId(),
+                            seat.getSeatNo(),
+                            seat.getSeatType() != null ? seat.getSeatType().toString() : null,
+                            seat.getPrice(),
+                            seat.getIsAvailable(),
+                            seat.getIsFoodContains(),
+                            seat.getIsAvailable() == true ? "AVAILABLE" : "BOOKED"
+                    )).collect(Collectors.toList());
+            dto.setShowSeats(seatDtos);
+        }
 
-        List<ShowDto> showDtos = showPage.getContent().stream()
-                .map(ShowDto::new)
-                .collect(Collectors.toList());
-
-        return new ShowResponse(
-                showDtos,
-                showPage.getTotalElements(),
-                showPage.getTotalPages(),
-                showPage.getNumber(),
-                showPage.getSize()
-        );
-    }
-
-    public ShowDto getShowById(Integer showId) {
-        Show show = showRepository.findById(showId)
-                .orElseThrow(() -> new RuntimeException("Show not found with ID: " + showId));
-        return new ShowDto(show);
+        return dto;
     }
 }

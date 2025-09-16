@@ -53,12 +53,14 @@
           <input type="hidden" id="showId">
           <select id="movieId"
             class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
-          <input type="text" id="location" placeholder="Location"
+          <select id="theaterId"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"></select>
+          <input type="date" id="showDate"
             class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <input type="datetime-local" id="showTime"
+          <input type="time" id="showTime" step="900"
             class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
-          <input type="number" id="price" placeholder="Ticket Price"
-            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+          <!-- <input type="number" id="price" placeholder="Ticket Price" step="50" min="0"
+            class="p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"> -->
           <button onclick="saveShow()"
             class="col-span-1 md:col-span-2 lg:col-span-3 py-3 px-6 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors duration-200">
             💾 Save Show
@@ -74,9 +76,10 @@
             <tr>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">ID</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Movie</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Theater</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Date</th>
+              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Time</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Location</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Show Time</th>
-              <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Price</th>
               <th scope="col" class="px-6 py-3 text-left text-sm font-medium">Actions</th>
             </tr>
           </thead>
@@ -93,82 +96,138 @@
     if (!token) window.location.href = "/user/login_animation.html";
 
     function loadMovies() {
-      fetch(CONFIG.API_URL + "/admin/movies", {
-        headers: { "Authorization": "Bearer " + token }
+      fetch(CONFIG.API_URL + "/movies/all", {
+        headers: { "Content-Type": "application/json" }//,"Authorization": "Bearer " + token
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to load movies");
+          return res.json();
+        })
         .then(movies => {
           const ddl = document.getElementById("movieId");
-          ddl.innerHTML = "";
+          ddl.innerHTML = "<option value=\"\">Select Movie</option>"; // Added placeholder
           movies.forEach(m => {
-            ddl.innerHTML += `<option value="${m.id}">${m.title}</option>`;
+            ddl.innerHTML += `<option value="${m.id}">${m.movieName}</option>`;
           });
-        });
+        })
+        .catch(error => console.error("Error loading movies:", error));
     }
 
-    function fetchShows() {
-      fetch(CONFIG.API_URL + "/admin/shows", {
-        headers: { "Authorization": "Bearer " + token }
+    function loadTheaters() {
+      fetch(CONFIG.API_URL + "/theaters/all", {
+        headers: { "Content-Type": "application/json" }// "Authorization": "Bearer " + token
       })
-        .then(res => res.json())
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to load theaters");
+          return res.json();
+        })
+        .then(theaters => {
+          const ddl = document.getElementById("theaterId");
+          ddl.innerHTML = "<option value=\"\">Select Theater</option>"; // Added placeholder
+          theaters.forEach(t => {
+            ddl.innerHTML += `<option value="${t.id}">${t.name}</option>`;
+          });
+        })
+        .catch(error => console.error("Error loading theaters:", error));
+    }
+
+
+    function fetchShows() {
+      fetch(CONFIG.API_URL + "/shows/all", {
+        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("Failed to fetch shows");
+          return res.json();
+        })
         .then(data => {
           const table = document.getElementById("showTable");
           table.innerHTML = "";
           data.forEach(s => {
+            const date = new Date(s.date).toLocaleDateString();
+            const time = new Date(`1970-01-01T${s.time}`).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             const row = document.createElement("tr");
             row.innerHTML = `
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.id}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${s.movieTitle}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.location}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${new Date(s.showTime).toLocaleString()}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${s.price}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.showId}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${s.movieName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${s.theaterName}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${date}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${time}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">₹${s.theaterLocation}</td>
             <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-              <button onclick="editShow(${s.id},${s.movieId},'${s.location}','${s.showTime}',${s.price})" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
+              <button onclick="editShow(${s.id}, ${s.movie.id}, ${s.theater.id}, '${s.date}', '${s.time}')" class="text-indigo-600 hover:text-indigo-900">✏ Edit</button>
               <button onclick="deleteShow(${s.id})" class="text-red-600 hover:text-red-900 ml-2">🗑 Delete</button>
             </td>
           `;
             table.appendChild(row);
           });
-        });
+        })
+        .catch(error => console.error("Error fetching shows:", error));
     }
 
     function saveShow() {
       const id = document.getElementById("showId").value;
       const show = {
         movieId: document.getElementById("movieId").value,
-        location: document.getElementById("location").value,
-        showTime: document.getElementById("showTime").value,
+        theaterId: document.getElementById("theaterId").value,
+        date: document.getElementById("showDate").value,
+        time: document.getElementById("showTime").value,
         price: document.getElementById("price").value
       };
+
+      if (!show.movieId || !show.theaterId || !show.date || !show.time) {
+        console.error('Please fill out all fields.');
+        return;
+      }
+
       let url = CONFIG.API_URL + "/admin/shows";
       let method = "POST";
-      if (id) { url += "/" + id; method = "PUT"; }
+      if (id) {
+        url += "/" + id;
+        method = "PUT";
+      }
 
       fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+        headers: {
+          "Content-Type": "application/json"
+          //,"Authorization": "Bearer " + token
+        },
         body: JSON.stringify(show)
-      }).then(() => { fetchShows(); resetForm(); });
+      }).then(res => {
+        if (!res.ok) throw new Error("Failed to save show");
+        return res.json();
+      }).then(() => {
+        fetchShows();
+        resetForm();
+      }).catch(error => console.error("Error saving show:", error));
     }
 
-    function editShow(id, movieId, location, showTime, price) {
+    function editShow(id, movieId, theaterId, date, time, price) {
       document.getElementById("showId").value = id;
       document.getElementById("movieId").value = movieId;
-      document.getElementById("location").value = location;
-      document.getElementById("showTime").value = showTime.substring(0, 16);
-      document.getElementById("price").value = price;
+      document.getElementById("theaterId").value = theaterId;
+      document.getElementById("showDate").value = date;
+      document.getElementById("showTime").value = time.substring(0, 5); // Time is stored as HH:mm:ss, but input is HH:mm
+      //document.getElementById("price").value = price;
     }
 
     function deleteShow(id) {
-      fetch(CONFIG.API_URL + "/admin/shows/" + id, {
+      console.log('Are you sure you want to delete this show?');
+      fetch(CONFIG.API_URL + "/shows/" + id, {
         method: "DELETE",
-        headers: { "Authorization": "Bearer " + token }
-      }).then(() => fetchShows());
+        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+      }).then(res => {
+        if (!res.ok) throw new Error("Failed to delete show");
+        fetchShows();
+      }).catch(error => console.error("Error deleting show:", error));
     }
 
     function resetForm() {
       document.getElementById("showId").value = "";
-      document.getElementById("location").value = "";
+      document.getElementById("movieId").value = "";
+      document.getElementById("theaterId").value = "";
+      document.getElementById("showDate").value = "";
       document.getElementById("showTime").value = "";
       document.getElementById("price").value = "";
     }
@@ -179,9 +238,9 @@
       window.location.href = "/user/login_animation.html";
     });
 
-    loadMovies();
+    //loadMovies();
+    //loadTheaters();
     fetchShows();
   </script>
 </body>
-
 </html>

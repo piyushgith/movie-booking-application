@@ -2,6 +2,7 @@ package com.micro.piyush.movie.repository;
 
 import com.micro.piyush.movie.entity.Show;
 import com.micro.piyush.movie.enums.LocationType;
+import com.micro.piyush.movie.request.ShowDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,12 @@ import java.util.Optional;
 
 @Repository
 public interface ShowRepository extends JpaRepository<Show, Integer>, JpaSpecificationExecutor<Show> {
+
+    @Query("SELECT s FROM Show s LEFT JOIN FETCH s.movie LEFT JOIN FETCH s.theater")
+    List<Show> findAllShowsWithDetails();
+
+    @Query("SELECT s FROM Show s LEFT JOIN FETCH s.movie LEFT JOIN FETCH s.theater WHERE s.showId = :id")
+    Show findShowWithDetails(@Param("id") Integer id);
 
     // JPQL query to fetch shows for a given location, along with related movie and theater details
     @Query("SELECT s FROM Show s JOIN FETCH s.movie m JOIN FETCH s.theater t WHERE t.location = :location")
