@@ -79,10 +79,10 @@
             <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
                 <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
                     <li><a href="../index.html" class="hover:text-gray-300 transition duration-300">Home</a></li>
-                    <li><a href="/user/homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
-                    <li><a href="/user/movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
-                    <li><a href="/user/shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
-                    <li><a href="/user/booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
+                    <li><a href="/src/user/homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+                    <li><a href="/src/user/movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
+                    <li><a href="/src/user/shows.html" class="hover:text-gray-300 transition duration-300">Shows</a></li>
+                    <li><a href="/src/user/booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
                             History</a>
                     </li>
                 </ul>
@@ -124,14 +124,14 @@
             const role = sessionStorage.getItem("role");
 
             if (!token) {
-                window.location.href = "/user/login_animation.html"; // redirect if not logged in
+                window.location.href = "/src/user/login_animation.html"; // redirect if not logged in
             }
 
             // Logout function
             $('#logoutBtn').on("click", () => {
                 sessionStorage.clear(); // Clear all session data
                 localStorage.clear(); // Clear all local storage data
-                window.location.href = "login_animation.html";
+                window.location.href = "/src/user/login_animation.html"; // Redirect to login page
             });
 
             let movies = [];
@@ -139,7 +139,7 @@
             async function loadMovies() {
                 try {
                     const response = await axios.get(CONFIG.API_URL+'/movies/all', {
-                        headers: { 'Content-Type': 'application/json' }
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
                     });
                     movies = response.data;
                     renderMovies();

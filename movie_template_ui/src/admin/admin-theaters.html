@@ -90,7 +90,7 @@
 
   <script>
     const token = sessionStorage.getItem("token");
-    if (!token) window.location.href = "/user/login_animation.html";
+    if (!token) window.location.href = "/src/user/login_animation.html";
 
     // Enums based on the provided Java code
     const locations = ["AHMEDABAD", "BANGALORE", "CHENNAI", "DELHI", "HYDERABAD", "KOLKATA", "MUMBAI", "PUNE"];
@@ -108,7 +108,7 @@
 
     function fetchTheaters() {
       fetch(CONFIG.API_URL + "/theaters/all", {
-        headers: { "Content-Type": "application/json" }
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }
       })
         .then(res => res.json())
         .then(data => {
@@ -151,7 +151,7 @@
 
       fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify(theater)
       }).then(res => {
         if (res.ok) {
@@ -177,7 +177,7 @@
       if (confirm("Are you sure you want to delete this theater?")) {
         fetch(CONFIG.API_URL + "/theaters/" + id, {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" }
+          headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }
         }).then(res => {
           if (res.ok) {
             fetchTheaters();
@@ -200,7 +200,7 @@
     document.getElementById("logoutBtn").addEventListener("click", () => {
       sessionStorage.clear(); // Clear all session data
       localStorage.clear(); // Clear all local storage data
-      window.location.href = "/user/login_animation.html";
+      window.location.href = "/src/user/login_animation.html";
     });
 
     populateDropdowns();

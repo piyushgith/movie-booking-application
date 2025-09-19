@@ -48,12 +48,12 @@
             <nav class="container mx-auto px-4 py-2 flex items-center justify-center">
                 <ul class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-8 text-lg font-medium">
                     <li><a href="../index.html" class="hover:text-gray-300 transition duration-300">Home</a></li>
-                    <li><a href="/user/homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
-                    <li><a href="/user/movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
-                    <li><a href="/user/shows.html"
+                    <li><a href="/src/user/homepage.html" class="hover:text-gray-300 transition duration-300">Dashboard</a></li>
+                    <li><a href="/src/user/movies.html" class="hover:text-gray-300 transition duration-300">Movies</a></li>
+                    <li><a href="/src/user/shows.html"
                             class="hover:text-gray-300 transition duration-300 border-b-2 border-indigo-600">Shows</a>
                     </li>
-                    <li><a href="/user/booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
+                    <li><a href="/src/user/booking_history.html" class="hover:text-gray-300 transition duration-300">Booking
                             History</a></li>
                 </ul>
             </nav>
@@ -105,6 +105,20 @@
     </main>
 
     <script>
+        const token = sessionStorage.getItem("token");
+        const role = sessionStorage.getItem("role");
+
+        if (!token) {
+            window.location.href = "/src/user/login_animation.html"; // redirect if not logged in
+        }
+
+        // Add logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            sessionStorage.clear(); // Clear all session data
+            localStorage.clear(); // Clear all local storage data
+            window.location.href = '/src/user/login_animation.html';
+        });
+
         // Get references to DOM elements
         const seatLayout = document.getElementById("seatLayout");
         const selectedSeatsEl = document.getElementById("selectedSeats");
@@ -133,26 +147,6 @@
         }
 
         /**
-         * Fetches CSRF token from a cookie named 'XSRF-TOKEN'.
-         * @returns {string|null} The CSRF token or null if not found.
-         */
-        function getCsrfToken() {
-            const name = 'XSRF-TOKEN';
-            let cookieValue = null;
-            if (document.cookie && document.cookie !== '') {
-                const cookies = document.cookie.split(';');
-                for (let i = 0; i < cookies.length; i++) {
-                    const cookie = cookies[i].trim();
-                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                        break;
-                    }
-                }
-            }
-            return cookieValue;
-        }
-
-        /**
           * Fetches seat data from the Spring Boot API
           */
         async function fetchSeats() {
@@ -162,7 +156,10 @@
                 loadingEl.classList.remove("hidden");
                 errorMessageEl.classList.add("hidden");
 
-                const response = await fetch(CONFIG.API_URL + `/shows_seat/${showId}/seats`);
+                const response = await fetch(CONFIG.API_URL + `/shows_seat/${showId}/seats`,{
+                    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }
+                });
+
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
@@ -343,12 +340,13 @@
                     seatIds: selectedSeats.map(seat => seat.seatId)
                 };
 
-                const csrfToken = getCsrfToken();
+                //const csrfToken = getCsrfToken();
                 const response = await fetch(CONFIG.API_URL + '/tickets/book', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        //'X-XSRF-TOKEN': csrfToken // Add the CSRF token to the header
+                        'Authorization': `Bearer ${sessionStorage.getItem('token') || ''}`
+
                     },
                     //credentials: 'include', // Important to send cookies for the CSRF token
                     body: JSON.stringify(bookingData)
@@ -396,13 +394,6 @@
         // Add event listeners
         clearBtn.addEventListener("click", clearSelection);
         proceedBtn.addEventListener("click", proceedToBooking);
-
-        // Add logout functionality
-        document.getElementById('logoutBtn').addEventListener('click', () => {
-            sessionStorage.clear(); // Clear all session data
-            localStorage.clear(); // Clear all local storage data
-            window.location.href = '/user/login_animation.html';
-        });
 
         // Initial load of the seat map
         if (showId) {

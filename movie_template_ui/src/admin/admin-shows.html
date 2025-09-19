@@ -139,7 +139,7 @@
 
   <script>
     const token = sessionStorage.getItem("token");
-    if (!token) window.location.href = "/user/login_animation.html";
+    if (!token) window.location.href = "/src/user/login_animation.html";
 
     // Global variable to store all shows to avoid repeated API calls
     let allShows = [];
@@ -149,7 +149,8 @@
     function loadMovies() {
       fetch(CONFIG.API_URL + "/movies/all", {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
         }
       })
         .then(res => {
@@ -169,7 +170,8 @@
     function loadTheaters() {
       fetch(CONFIG.API_URL + "/theaters/all", {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
         }
       })
         .then(res => {
@@ -189,7 +191,8 @@
     function fetchAndRenderShows() {
       fetch(CONFIG.API_URL + "/shows/all", {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
         }
       })
         .then(res => {
@@ -361,7 +364,7 @@
         method: method,
         headers: {
           "Content-Type": "application/json"
-          //,"Authorization": "Bearer " + token
+          , "Authorization": "Bearer " + token
         },
         body: JSON.stringify(show)
       })
@@ -417,7 +420,8 @@
       fetch(CONFIG.API_URL + "/shows/" + id, {
         method: "DELETE",
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
         },
       }).then(res => {
         if (!res.ok) throw new Error("Failed to delete show");
@@ -437,7 +441,7 @@
     document.getElementById("logoutBtn").addEventListener("click", () => {
       sessionStorage.clear();
       localStorage.clear();
-      window.location.href = "/user/login_animation.html";
+      window.location.href = "/src/user/login_animation.html";
     });
 
     loadMovies();

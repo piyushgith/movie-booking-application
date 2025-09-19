@@ -108,11 +108,11 @@
 
   <script>
     const token = sessionStorage.getItem("token");
-    if (!token) window.location.href = "/user/login_animation.html";
+    if (!token) window.location.href = "/src/user/login_animation.html";
 
     function fetchUsers() {
-      fetch(CONFIG.API_URL + "/admin/user/all", {
-        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+      fetch(CONFIG.API_URL + "/user/all", {
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }
       })
         .then(res => res.json())
         .then(data => {
@@ -157,7 +157,7 @@
         password: document.getElementById("password").value
       };
 
-      let url = CONFIG.API_URL + "/admin/user";
+      let url = CONFIG.API_URL + "/user";
       let method = "POST";
 
       // Check if a userId exists to determine if it's a PUT or POST call
@@ -169,7 +169,7 @@
 
       fetch(url, {
         method: method,
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
         body: JSON.stringify(user)
       }).then(() => {
         // Assuming fetchUsers() and resetForm() are defined elsewhere
@@ -191,9 +191,9 @@
     }
 
     function deleteUser(id) {
-      fetch(CONFIG.API_URL + "/admin/user/" + id, {
+      fetch(CONFIG.API_URL + "/user/user/" + id, {
         method: "DELETE",
-        headers: { "Content-Type": "application/json" }//"Authorization": "Bearer " + token,
+        headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token }
       }).then(() => fetchUsers());
     }
 
@@ -212,7 +212,7 @@
     document.getElementById("logoutBtn").addEventListener("click", () => {
       sessionStorage.clear(); // Clear all session data
       localStorage.clear(); // Clear all local storage data
-      window.location.href = "/user/login_animation.html";
+      window.location.href = "/src/user/login_animation.html";
     });
 
     fetchUsers();
