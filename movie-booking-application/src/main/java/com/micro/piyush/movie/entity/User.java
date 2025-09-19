@@ -47,7 +47,7 @@ public class User {
 
     // Relationships
     // A User can have many UserRoles
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     @JsonManagedReference // This side is serialized in a bidirectional relationship
     private Set<UserRole> userRoles = new HashSet<>();
 

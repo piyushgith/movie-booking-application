@@ -25,6 +25,10 @@ public class JWTService {
         return extractClaim(token, Claims::getSubject);
     }
 
+    public String extractEmailId(String token) {
+        return extractClaim(token, claims -> claims.get("email", String.class));
+    }
+
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -43,8 +47,8 @@ public class JWTService {
     }
 
     public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        final String emailId = extractEmailId(token);
+        return (emailId.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
     public String generateToken(User user,String role) {

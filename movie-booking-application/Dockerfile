@@ -39,4 +39,4 @@ ENV SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.H2Dialect
 ENV SPRING_JPA_HIBERNATE_DDL_AUTO=update
 
 # Run the application
-CMD ["java", "-jar", "target/movie-booking-application-0.0.1-SNAPSHOT.jar"]
+CMD ["java", "-jar", "target/movie-booking-application.jar"]

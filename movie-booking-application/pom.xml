@@ -121,6 +121,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>movie-booking-application</finalName>
 	</build>
 
 </project>

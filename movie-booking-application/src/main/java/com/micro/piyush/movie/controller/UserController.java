@@ -35,7 +35,7 @@ public class UserController {
     @Autowired
     private JWTService jwtService;
 
-    @PostMapping("/admin/user/register")
+    @PostMapping("/user/register")
     public ResponseEntity<Object> addNewUser(@RequestBody UserRequest userEntryDto) {
         try {
             User result = userService.addUser(userEntryDto);
@@ -45,17 +45,17 @@ public class UserController {
         }
     }
 
-    @PutMapping("/admin/user")
+    @PutMapping("/user")
     public UserResponse updateUser(@RequestBody UserRequest userEntryDto) {
         return userService.updateUser(userEntryDto);
     }
 
-    @GetMapping("/admin/user/all")
+    @GetMapping("/user/all")
     public List<UserResponse> getAllUsers() {
         return userService.getAllUsers();
     }
 
-    @DeleteMapping("/admin/user/{id}")
+    @DeleteMapping("/user/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Integer id) {
         try {
             userService.deleteUser(id);
