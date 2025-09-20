@@ -1,0 +1,179 @@
+
+sudo docker run -p 4000:4000 --env-file .env -v movie-data:/app/data movie-booking-app
+
+
+
+# =========================
+# 1. Single Environment Variables with -e (Port 4000)
+# =========================
+
+# Basic run with custom database settings on port 4000
+docker run -p 4000:4000 \
+  -e SPRING_PROFILES_ACTIVE=prod \
+  -e SPRING_DATASOURCE_PASSWORD=mySecretPassword \
+  -e SPRING_H2_CONSOLE_ENABLED=false \
+  -v movie-data:/app/data \
+  movie-booking-app
+
+# Access your app at: http://localhost:4000
+
+# =========================
+# 2. Multiple Environment Variables
+# =========================
+
+# Override multiple H2 and Spring Boot settings
+docker run -p 4000:4000 \
+  -e SPRING_PROFILES_ACTIVE=production \
+  -e SERVER_PORT=8080 \
+  -e SPRING_DATASOURCE_URL="jdbc:h2:file:/app/data/proddb;AUTO_SERVER=TRUE" \
+  -e SPRING_DATASOURCE_USERNAME=admin \
+  -e SPRING_DATASOURCE_PASSWORD=securePassword123 \
+  -e SPRING_H2_CONSOLE_ENABLED=false \
+  -e SPRING_JPA_HIBERNATE_DDL_AUTO=validate \
+  -e SPRING_JPA_SHOW_SQL=false \
+  -e JAVA_OPTS="-Xms512m -Xmx1024m" \
+  -v movie-prod-data:/app/data \
+  movie-booking-app
+
+# =========================
+# 3. Using Environment File (.env)
+# =========================
+
+# Create .env file first:
+# SPRING_PROFILES_ACTIVE=staging
+# SPRING_DATASOURCE_PASSWORD=stagingPassword
+# SPRING_H2_CONSOLE_ENABLED=true
+# SPRING_JPA_SHOW_SQL=true
+
+docker run -p 4000:4000 --env-file .env -v movie-staging-data:/app/data  movie-booking-app
+
+# =========================
+# 4. Development Mode with H2 Console Access (Port 4000)
+# =========================
+
+# Run with H2 console enabled - Access at http://localhost:4000/h2-console
+docker run -p 4000:4000 \
+  -e SPRING_PROFILES_ACTIVE=dev \
+  -e SPRING_H2_CONSOLE_ENABLED=true \
+  -e SPRING_H2_CONSOLE_PATH=/h2-console \
+  -e SPRING_JPA_SHOW_SQL=true \
+  -e LOGGING_LEVEL_ROOT=DEBUG \
+  -v movie-dev-data:/app/data \
+  --name movie-booking-dev \
+  movie-booking-app
+
+# H2 Console: http://localhost:4000/h2-console
+
+# =========================
+# 5. Production Mode (Secure)
+# =========================
+
+# Production run with security hardening
+docker run -d -p 4000:4000 \
+  -e SPRING_PROFILES_ACTIVE=production \
+  -e SPRING_DATASOURCE_PASSWORD=VerySecurePassword123! \
+  -e SPRING_H2_CONSOLE_ENABLED=false \
+  -e SPRING_JPA_HIBERNATE_DDL_AUTO=validate \
+  -e SPRING_JPA_SHOW_SQL=false \
+  -e MANAGEMENT_ENDPOINTS_WEB_EXPOSURE_INCLUDE=health,info \
+  -e JAVA_OPTS="-Xms256m -Xmx512m -XX:+UseG1GC" \
+  -v movie-prod-data:/app/data \
+  --restart unless-stopped \
+  --name movie-booking-prod \
+  movie-booking-app
+
+# =========================
+# 6. Custom Database Location
+# =========================
+
+# Run with custom database file location
+docker run -p 4000:4000 \
+  -e SPRING_DATASOURCE_URL="jdbc:h2:file:/custom/path/moviedb;AUTO_SERVER=TRUE" \
+  -v /host/custom/path:/custom/path \
+  -v movie-custom-data:/app/data \
+  movie-booking-app
+
+# =========================
+# 7. Docker Compose Alternative
+# =========================
+
+# Create docker-compose.yml:
+# version: '3.8'
+# services:
+#   movie-booking:
+#     image: movie-booking-app
+#     ports:
+#       - "4000:4000"
+#     environment:
+#       SPRING_PROFILES_ACTIVE: production
+#       SPRING_DATASOURCE_PASSWORD: myPassword
+#       SPRING_H2_CONSOLE_ENABLED: false
+#     volumes:
+#       - movie-data:/app/data
+# volumes:
+#   movie-data:
+
+# Then run:
+# docker-compose up -d
+
+# =========================
+# 8. Interactive Run (for debugging)
+# =========================
+
+# Run interactively with shell access
+docker run -it -p 4000:4000 \
+  -e SPRING_PROFILES_ACTIVE=debug \
+  -e SPRING_H2_CONSOLE_ENABLED=true \
+  -v movie-debug-data:/app/data \
+  movie-booking-app /bin/bash
+
+# =========================
+# 9. Memory and Performance Tuning
+# =========================
+
+# Run with JVM performance tuning
+docker run -p 4000:4000 \
+  -e JAVA_OPTS="-Xms256m -Xmx1024m -XX:+UseG1GC -XX:+UseStringDeduplication" \
+  -e SPRING_PROFILES_ACTIVE=performance \
+  -v movie-perf-data:/app/data \
+  --memory=1.5g \
+  --cpus=2 \
+  movie-booking-app
+
+# =========================
+# 10. H2 Console Access Commands
+# =========================
+
+# After running container, access H2 console at:
+# http://localhost:4000/h2-console
+
+# Connection settings for H2 console:
+# JDBC URL: jdbc:h2:file:/app/data/moviedb
+# User Name: sa
+# Password: (whatever you set in SPRING_DATASOURCE_PASSWORD)
+
+# =========================
+# 11. View Running Container Environment
+# =========================
+
+# Check environment variables in running container
+docker exec movie-booking-app env | grep SPRING
+
+# =========================
+# 12. Common Environment Variables for Spring Boot H2
+# =========================
+
+# All available environment variables you can override:
+# SPRING_PROFILES_ACTIVE=dev,staging,production
+# SERVER_PORT=4000
+# SPRING_DATASOURCE_URL=jdbc:h2:file:/app/data/moviedb
+# SPRING_DATASOURCE_USERNAME=sa
+# SPRING_DATASOURCE_PASSWORD=password
+# SPRING_H2_CONSOLE_ENABLED=true/false
+# SPRING_H2_CONSOLE_PATH=/h2-console
+# SPRING_JPA_HIBERNATE_DDL_AUTO=create,update,validate,none
+# SPRING_JPA_SHOW_SQL=true/false
+# SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.H2Dialect
+# LOGGING_LEVEL_ROOT=INFO,DEBUG,WARN,ERROR
+# JAVA_OPTS="-Xms256m -Xmx512m"
+

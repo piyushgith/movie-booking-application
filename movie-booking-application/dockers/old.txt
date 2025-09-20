@@ -1,0 +1,24 @@
+# Development
+sudo docker run -p 4000:4000 --env-file .env.dev -v movie-data:/app/data movie-booking-app
+
+# Production
+sudo docker run -p 4000:4000 --env-file .env.prod -v movie-data:/app/data movie-booking-app
+
+#==========================================================================================
+
+# Using docker run with .env
+sudo docker run -p 4000:4000 --env-file .env -v movie-data:/app/data movie-booking-app
+
+# Using docker-compose
+sudo docker-compose up -d
+
+# Using docker-compose with specific file
+sudo docker-compose -f docker-compose.dev.yml up -d
+sudo docker-compose -f docker-compose.prod.yml up -d
+
+# Override specific variables
+docker run -p 4000:4000 \
+  --env-file .env \
+  -e SPRING_DATASOURCE_PASSWORD=CustomPassword \
+  -v movie-data:/app/data \
+  movie-booking-app

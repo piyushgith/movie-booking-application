@@ -7,7 +7,6 @@ import java.time.LocalTime;
 
 @Data
 public class ShowRequest {
-
     private LocalTime showStartTime;
     private LocalDate showDate;
     private Integer theaterId;

@@ -366,7 +366,7 @@
             const role = document.getElementById('role').value.trim();
 
             try {
-                const response = await axios.post(CONFIG.API_URL+'/admin/user/register', {
+                const response = await axios.post(CONFIG.API_URL+'/user/register', {
                     name,
                     emailId,
                     password,

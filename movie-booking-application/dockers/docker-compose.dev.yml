@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  movie-booking-app:
+    image: movie-booking-app
+    container_name: movie-booking-dev
+    ports:
+      - "4000:4000"
+      - "8080:8080"
+    env_file:
+      - .env.dev
+    volumes:
+      - movie-dev-data:/app/data
+    environment:
+      - SPRING_H2_CONSOLE_ENABLED=true
+      - LOGGING_LEVEL_ROOT=DEBUG
+
+volumes:
+  movie-dev-data:

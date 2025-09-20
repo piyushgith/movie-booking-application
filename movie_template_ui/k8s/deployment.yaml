@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movie-ui-deployment
+  labels:
+    app: movie-ui
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: movie-ui
+  template:
+    metadata:
+      labels:
+        app: movie-ui
+    spec:
+      containers:
+        - name: movie-ui
+          # Update this image to your registry/image:tag for production
+          image: movie-ui:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 80
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            failureThreshold: 3
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 80
+            initialDelaySeconds: 30
+            periodSeconds: 30
+            failureThreshold: 3
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

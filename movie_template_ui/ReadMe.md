@@ -41,7 +41,7 @@ docker build -t movie-booking-ui:latest .
 
 ```bash
 # Run the container
-docker run -d -p 80:80 --name movie-booking-ui movie-booking-ui:latest
+docker run -d -p 9000:80 --name movie-booking-ui movie-booking-ui:latest
 
 # To stop the container
 docker stop movie-booking-ui
@@ -50,7 +50,7 @@ docker stop movie-booking-ui
 docker start movie-booking-ui
 ```
 
-The application will be available at: http://localhost:80
+The application will be available at: http://localhost:9000
 
 ## Development Setup
 
@@ -62,11 +62,11 @@ If you want to run the application without Docker for development:
 
 ## Configuration
 
-The application expects the backend API to be running at `http://localhost:8080`. If your backend is running on a different URL, update the API URL in `config.js`.
+The application expects the backend API to be running at `http://localhost:4000`. If your backend is running on a different URL, update the API URL in `config.js`.
 
 ```javascript
 // config.js
-const API_BASE_URL = 'http://localhost:8080';
+const API_BASE_URL = 'http://localhost:4000/api';
 ```
 
 ## Directory Structure
