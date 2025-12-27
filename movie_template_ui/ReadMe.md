@@ -34,20 +34,20 @@ git clone https://github.com/yourusername/movie-booking-application.git
 cd movie-booking-application/movie_template_ui
 
 # Build the Docker image
-docker build -t movie-booking-ui:latest .
+sudo docker build -t movie-booking-ui:latest .
 ```
 
 ### Running the Container
 
 ```bash
 # Run the container
-docker run -d -p 9000:80 --name movie-booking-ui movie-booking-ui:latest
+sudo docker run -d -p 9000:80 --name movie-booking-ui movie-booking-ui:latest
 
 # To stop the container
-docker stop movie-booking-ui
+sudo docker stop movie-booking-ui
 
 # To start an existing container
-docker start movie-booking-ui
+sudo docker start movie-booking-ui
 ```
 
 The application will be available at: http://localhost:9000
